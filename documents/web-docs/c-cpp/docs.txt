@@ -1,0 +1,15 @@
+Memoization functor wrapper in c++
+http://stackoverflow.com/questions/24637619/memoization-functor-wrapper-in-c
+
+
+
+Memoized, recursive factorial function?
+http://stackoverflow.com/questions/9729212/memoized-recursive-factorial-function?lq=1
+
+
+
+Why is std::make_tuple(7 + N¡­) legal in C++11?
+http://stackoverflow.com/questions/24647926/why-is-stdmake-tuple7-n-legal-in-c11
+
+
+
