@@ -18,3 +18,10 @@ http://stackoverflow.com/questions/23516696/recursion-vs-bitmasking-for-getting-
 *****
 
 
+How to implement classic sorting algorithms in modern C++?
+http://stackoverflow.com/questions/24650626/how-to-implement-classic-sorting-algorithms-in-modern-c
+http://coliru.stacked-crooked.com/a/d3957b5f147c146e
+*****
+
+
+
