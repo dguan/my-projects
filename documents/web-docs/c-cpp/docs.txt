@@ -19,5 +19,20 @@ http://coliru.stacked-crooked.com/a/d3957b5f147c146e
 *****
 
 
+how to write a C++11 template that can take a const iterator
+http://stackoverflow.com/questions/24675366/how-to-write-a-c11-template-that-can-take-a-const-iterator
+****
+
+
+
+How can I initialize a vector in the initializer list of a varargs constructor?
+http://stackoverflow.com/questions/24670369/how-can-i-initialize-a-vector-in-the-initializer-list-of-a-varargs-constructor
+
+
+
+
+
+
+
 
 
