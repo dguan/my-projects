@@ -30,6 +30,55 @@ http://stackoverflow.com/questions/24670369/how-can-i-initialize-a-vector-in-the
 
 
 
+Is there a standard sign function (signum, sgn) in C/C++?
+http://stackoverflow.com/questions/1903954/is-there-a-standard-sign-function-signum-sgn-in-c-c
+
+
+
+*****
+generic-template-for-calling-function-with-vector-elements
+http://stackoverflow.com/questions/17114213/generic-template-for-calling-function-with-vector-elements
+http://coliru.stacked-crooked.com/view?id=e7a13a526366f4eae3b2f46843fba3c2-0bcbabce5e03da787bd7f789f9dd7c18
+
+#include <iostream>
+#include <functional>
+#include <vector>
+
+void foo(int a, int b)
+{
+  std::cout << (a*10+b) << "\n" << std::endl;
+}
+
+template<int... Is>
+struct seq { };
+
+template<int N, int... Is>
+struct gen_seq : gen_seq<N - 1, N - 1, Is...> { };
+
+template<int... Is>
+struct gen_seq<0, Is...> : seq<Is...> { };
+
+template<class... Args, int... Is>
+void callByVector(std::function<void(Args...)> f, std::vector<int>& arguments, seq<Is...>)
+{
+  f(arguments[Is]...);
+}
+
+template<class... Args>
+void callByVector(std::function<void(Args...)> f, std::vector<int>& arguments)
+{
+  callByVector(f, arguments, gen_seq<sizeof...(Args)>());
+}
+
+int main()
+{
+  std::vector<int> arguments;
+  arguments.push_back(2);
+  arguments.push_back(3);
+
+  callByVector(std::function<void(int,int)>(foo),arguments);
+}
+
 
 
 

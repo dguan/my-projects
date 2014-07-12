@@ -1,3 +1,14 @@
+FXT: a library of algorithms
+http://www.jjj.de/fxt/#fxtbook
+http://www.jjj.de/fft/fftpage.html
+*****
+
+
+Fast permutation -> number -> permutation mapping algorithms
+http://stackoverflow.com/questions/1506078/fast-permutation-number-permutation-mapping-algorithms
+*****
+
+
 What is the big-O complexity of this naive code to compute combinations?
 http://stackoverflow.com/questions/16619187/what-is-the-big-o-complexity-of-this-naive-code-to-compute-combinations?rq=1
 ****
