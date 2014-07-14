@@ -1,4 +1,4 @@
-This is various kinds of combination and permution algorithm's implementation, from recursive algorithm and its naive non-recursive implementation.
+This is various kinds of combination and permution algorithm's implementation, from recursive algorithm and its basic non-recursive implementation to more efficient non-recursive implementations.
 
 Some thing to remark:
 
