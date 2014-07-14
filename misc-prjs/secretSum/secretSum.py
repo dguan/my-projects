@@ -1,19 +1,25 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
 
 """
-(c) david guan, dgacfr@gmail.com, gdyxgzy@hotmail.com
-
-This code has been tested with Python 2.7.6, the complexity of the code is roughly O(10^n), where n is the
-total number of unique pattern chars and wild cards in the 2 oprands. Also, the complexity can be largely
-influenced by the pattern, for example, '?? * ????? = #####' and 'abcde + cdefg = efgab' both have 7 patterns
-in the 2 operands, but the latter takes only about 1/4 time of the former. Further, multiprocessing can
-reduce the time complexity to about 1/NC, where NC is the number of cores/processors in the computer.
+(c) david guan, gdyxgzy@hotmail.com
+The complexity of the code is roughly O(10^n), where n is the total number of pattern chars and
+wild cards in the 2 oprands. The pattern is also a big factor that could influence the complexity, for example,
+'?? * ????? = #####' and 'abcde + cdefg = efgab' both have 7 patterns in the 2 operands, but the latter is 6 times faster than the former. Also, I divided the total solution space into 10 separate subspaces and, by using python multiprocessing, the time complexity can be reduced to about 1/NC, where NC is the number of cores/processors in the computer. Because my PC has only 4 cores, so 10 is enough, for larger scale problem, it can be divided into many small tasks and get processed using distributed processing.
 
 TODO:
-Well, this code is just for fun, yet it still could be extended to some extent, the most important feature
-should be accepting expressions as oprands and result, so it can do some more powerful work such as finding
-Pythagorean Triples or solve equations, etc. And then I think I could use this code as basis to develop a
-small math game for children. As for engineers, they have Matlab already ......
+This is just an interesting question, anyway, I think I could improve this code by adding some features especially accepting expressions as oprands and result, or adding rational number support, this will enable this script to do some more complicated and powerful works such as finding Pythagorean Triples, solving equations, etc, or I can use this code as a basis to develop a small math game for children.
+
+Test Cases:
+1)	~ * ~ = ?? this will print none zero one digit multiplication table, from 1*1, 1*2, . . to 9*8, 9*9
+2)	a * a = ?? : this will print the one digit square table, 0*0, 1*1, to 8*8, 9*9
+3)	zZ * zZ = ???? : this will print square table from 00*00, 01*01, to 98*98, 99*99
+4)	abcde * f = edcba : there is only one solution, 21978 * 4 = 87912
+5)	??? * ????? = ##### : find out factors for numbers like 11111, 22222, to 99999. This is obviously an O(10^8) complexity problem, on my 3 GHz, 4 GB, Quad-Core PC it takes about 80 seconds.
+6)	abcdef + cdefgh = efghij : This one is also an O(10^8) complexity problem, but because of the pattern constrain, it only takes about 9 seconds to find 2 solutions
+7)	??? * ?????? = %%%%%% : this is an O(10^9) complexity problem, be warned that it takes about 900 seconds to run on my machine.
+8)	Abcde + Fghij = $$$$$ : Although this one is seemingly an O(10^10) complexity problem, yet it only takes about 30 seconds to print 3072 solutions.
+. . . . . .
 """
 
 import re
@@ -21,48 +27,46 @@ import time
 from sys import stderr as stderr # I just want to use an easy unbuffered output
 import multiprocessing as multi_proc
 
-### In order not to make this script too long, some docs and comments are not included ...
+pat_chars_normal = 'abcdefghijklmnopqrstuvwxyz'  # pattern characters
+pat_chars_nz = 'ABCDEFGHI' # none zero pattern chars
 
-pat_chars_normal = 'abcdefghijklmnopqrstuvwxyz'
-pat_chars_nz = 'ABCDEFGHI'
-
-#wild card chars
-wild_card = '?'
-wild_card_nz = '~'
-wc_uniq = 'QRSTUVWXYZ'
-wc_uniq_nz = '@#$%^&*()'
-wc_uniq_nz_re_str = '@#$%^&*\(\)' # for regex checking
+wild_card = '?'          # wild card, can be anything from 0 -9
+wild_card_nz = '~'       # none zero wild card, anything from 1 - 9
+wc_uniq = 'QRSTUVWXYZ' # unique wild cards, if X is assigned 0, then Y cannot be 0
+wc_uniq_nz = '@#$%^&*()' # none zero unique wild cards
+wc_uniq_nz_re_str = '@#$%^&*\(\)'  # regex string for input checking
 
 digits = '0123456789'
 digits_nz = '123456789'
 
-digits_set = set(digits) # fast look-up table to check if a char is a digit
-pat_char_set = set(pat_chars_normal+pat_chars_nz) # fast look-up table for pattern chars
-wc_uniq_char_set = set(wc_uniq + wc_uniq_nz) #fast look-up table for uniq wild cards
-nz_char_set = set(pat_chars_nz + wc_uniq_nz) # fast look-up table for none-zero chars
+digits_set = set(digits)   # fast look-up table to check if a char is a digit
+pat_char_set = set(pat_chars_normal+pat_chars_nz)   # fast look-up table for pattern chars
+wc_uniq_char_set = set(wc_uniq + wc_uniq_nz)   # fast look-up table for uniq wild cards
+nz_char_set = set(pat_chars_nz + wc_uniq_nz)   # fast look-up table for none-zero chars
 
 def Usage() :
-    print 'Welcome to secretSum, this program can find out solutions for your mysterious expressions.'
-    print 'The expressions are like \'oprand1 op oprand2 = result\', like abcd + bcde = cdea, or zZ * zZ = ????'
-    print 'Allowed operations are \'+\', \'-\', \'*\', \'/\', and \'%\', all operations are in integers.'
-    print 'The meaning of allowed chars are explained as following :'
-    print '      0 - 9 : digits, can be used any where, like a3 + b4 = 5c '
-    print '      a - z : normal unique pattern chars, can be 0--9 '
-    print '      A - I : 9 none zero unique pattern chars, can be 1--9 '
-    print '       ?, ~ : none pattern wild cards, ? can take any value, ~ can take any none zero value'
-    print '      Q - Z : 10 none pattern unique wild cards, can substitute any pattern char, value value 0--9'
-    print '  @#$%^&*() : 9 none zero unique wild cards, can substitute any pattern char, value range 1 -- 9'
+    print """ Welcome to secretSum, this program can find out solutions for your mysterious expressions.
+    The expressions are like \'oprd1 op oprd2 = result\', like abcd + bcde = cdea, or zZ * zZ = ????
+    Allowed operations are \'+\', \'-\', \'*\', \'/\', and \'%\', all operations are in integers.
+    The meaning of allowed chars are explained as following :
+      0 - 9 : digits, can be used anywhere, like a3 + b4 = 5c 
+      a - z : normal unique pattern chars, can be 0--9
+      A - I : 9 none zero unique pattern chars, can be 1--9
+      ?, ~ : none pattern wild cards, ? can take any value, ~ can take any none zero value
+      Q - Z : 10 none pattern unique wild cards, can substitute any pattern char, value range 0 -- 9
+      @#$%^&*() : 9 none zero unique wild cards, can substitute any pattern char, value range 1 -- 9
+    """ 
 
 # if expected is not None, only verify if a match exists or not, otherwise return all availables
 def find_availables(x_map, x_char, expected=None) :
     rslts = ''
-    if expected is None : # need to return all availables
-        if x_map.get(x_char) is None:
+    if not expected : # need to return all availables
+        if not x_map.get(x_char):
             rslts = filter(lambda d : d not in x_map.values(), digits_nz if x_char in nz_char_set else digits)
         else : # This pattern has been already assigned a value
             rslts = x_map[x_char]
     else : #check if if there is a match for expected
-        if x_map.get(x_char) is None :
+        if not x_map.get(x_char) :
             if expected in x_map.values() :
                 return None
             else :
@@ -92,11 +96,11 @@ def check_validity(pat_map, wc_map, cur_pat, target) :
             return False
         else:
             break
-    if len(cur_pat)-pat_idx == 0 :
+    if len(cur_pat) == pat_idx :
         return True
     else:
         x_map = pat_map if cur_pat[pat_idx] in pat_char_set else wc_map
-        if find_availables(x_map, cur_pat[pat_idx], target[pat_idx]) is None :
+        if find_availables(x_map, cur_pat[pat_idx], target[pat_idx]) is None:
             return False
         else:
             x_map[cur_pat[pat_idx]] = target[pat_idx]
@@ -228,7 +232,7 @@ if __name__ == '__main__' :
                 else :
                     stderr.write('\n'+s)
                     rslt_cnt += 1
-            if active_proc_cnt == 0:
+            if not active_proc_cnt :
                 print
                 break;
             else :
@@ -237,7 +241,7 @@ if __name__ == '__main__' :
         for p in processes :
             p.join()
             
-        if rslt_cnt == 0 :
+        if not rslt_cnt :
             print 'No solution for %s in %f seconds' % (expression, time.time()-t0)
         else :
             print '%d solutions for %s in %f seconds' % (rslt_cnt, expression, time.time()-t0)
