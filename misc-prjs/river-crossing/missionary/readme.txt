@@ -11,7 +11,7 @@ This solution is an improvement over the original problem, it can deal with arbi
 
 (3) There is no solution when M=C=4 and boat's capacity=2.
 
-(4) There are solution when M=C=4 or 5, and the boat's capacity increased to 3.
+(4) There are solutions when M=C=4 or 5, and the boat's capacity increased to 3.
 
 (5) There is no solution when M=C=6, and the boat's capacity is still 3. Actually, it can be mathematically or logically proved that, when M=C=X, boat's capacity is Y(N=2 or 3), there's no solution when Y*2 <= X.
 
