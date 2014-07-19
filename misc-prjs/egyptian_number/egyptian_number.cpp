@@ -69,8 +69,8 @@ int main(void)
 		//int num_parts = 8;
 		int max_number, num_parts;
 		std::cout << "Please input the maximum number and how many parts seperated with a space." << std::endl;
-		std::cout << "Note that, it is not suggested to set parts bigger than 8," << std::endl;
-		std::cout << "Total results increase dramatically especially when parts increase." << std::endl;
+		std::cout << "input 0 or negative number to quit." << std::endl;
+		std::cout << "Note that, it is not recommended to set parts bigger than 8," << std::endl;
 		std::cout << "Max number and parts are: ";
 		std::cin >> max_number >> num_parts;
 		if (max_number <= 0 || num_parts <= 0)
