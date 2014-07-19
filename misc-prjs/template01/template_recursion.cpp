@@ -305,13 +305,36 @@ int main(void)
 }
 #endif
 
+
+
+
+
+
 #include <iostream>
 #include <cstdint>
 
+/////////////////////////////////////////////////////////////////
 //
-// Counting pathes from LU corner to RL corner of an M*N matrix
-// Note that: 0*0 matrix will lead to ambiguity whilch can be solved by providing a MATRIX_PATH_CNT<0, 0> specialization
+//    General purpose template function to determine if M >= N
 //
+/////////////////////////////////////////////////////////////////
+template<int M, int N> struct M_GT_N
+{
+	enum{ val = M > N };
+};
+
+
+
+//------------------------------------------- Seperator Line ---------------------------------------------------------------
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//    Counting pathes from LU corner to RL corner of an M*N matrix
+//    Note that: 0*0 matrix will lead to ambiguity whilch can be solved by providing a MATRIX_PATH_CNT<0, 0> specialization
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<int M, int N> struct MATRIX_PATH_CNT
 {
 	enum class v : int64_t { val = static_cast<int64_t>(MATRIX_PATH_CNT<M - 1, N>::v::val) + static_cast<int64_t>(MATRIX_PATH_CNT<M, N - 1>::v::val) };
@@ -324,8 +347,11 @@ template<int M> struct MATRIX_PATH_CNT<M, 0>
 {
 	enum class v : int64_t { val = 1 };
 };
-
-// Another way to calculate pathes
+//////////////////////////////////////////////
+//
+//    Another way to calculate pathes
+//
+//////////////////////////////////////////////
 template<int M, int N> struct COMBINATION;
 template<int M, int N> struct OTHER_MATRIX_PATH_CNT
 {
@@ -334,13 +360,15 @@ template<int M, int N> struct OTHER_MATRIX_PATH_CNT
 
 
 
+//------------------------------------------- Seperator Line ---------------------------------------------------------------
+
+
+
+//////////////////////////////////////////////////////////////////////
 //
-// Calculate Catalan Number
+//    Calculate Catalan Number
 //
-template<int M, int N> struct M_GT_N
-{
-	enum{ val = M > N };
-};
+//////////////////////////////////////////////////////////////////////
 template<int M, int N, bool flag> struct CATALAN
 {
 	enum class v : int64_t { val = static_cast<int64_t>(CATALAN<M - 1, N, M_GT_N<M - 1, N>::val>::v::val) + static_cast<int64_t>(CATALAN<M, N - 1, M_GT_N<M, N - 1>::val>::v::val) };
@@ -354,7 +382,11 @@ template<int N> struct CATALAN<0, N, false>
 	enum class v : int64_t { val = 1 };
 };
 
-// Another way to calculate Catalan Number
+//////////////////////////////////////////////////////////////////////
+//
+//    Another way to calculate Catalan Number
+//
+//////////////////////////////////////////////////////////////////////
 template<int M, int I> struct CAT_SUM;
 template<int M> struct OTHER_CATALAN
 {
@@ -374,9 +406,15 @@ template<int M> struct CAT_SUM<M, -1>
 };
 
 
+//------------------------------------------- Seperator Line ---------------------------------------------------------------
+
+
+
+//////////////////////////////////////////////////////////////////////
 //
-// Calculate Combination Number
+//    Calculate Combination Number
 //
+//////////////////////////////////////////////////////////////////////
 template<int S, int M, int N> struct COMBO_SUM;
 template<int M, int N> struct COMBINATION
 {
@@ -395,7 +433,11 @@ template<int M, int N> struct COMBO_SUM<0, M, N>
 	enum class v : int64_t { val = 0 };
 };
 
-// Another way to calculate Combination Number
+//////////////////////////////////////////////////////////////////////
+//
+//    Another way to calculate Combination Number
+//
+//////////////////////////////////////////////////////////////////////
 template<int M, int N> struct OTHER_COMBO
 {
 	enum class v : int64_t { val = MATRIX_PATH_CNT<M - N, N>::v::val };
@@ -403,9 +445,15 @@ template<int M, int N> struct OTHER_COMBO
 
 
 
+//------------------------------------------- Seperator Line ---------------------------------------------------------------
+
+
+
+//////////////////////////////////////////////////////////////////////
 //
-// Calculate Permutation Number
+//    Calculate Permutation Number
 //
+//////////////////////////////////////////////////////////////////////
 template<int S, int M, int N> struct PERMU_SUM;
 template<int M, int N> struct PERMUTATION
 {
@@ -424,7 +472,11 @@ template<int M, int N> struct PERMU_SUM<0, M, N>
 	enum class v : int64_t { val = 0 };
 };
 
-// Another way to calculate Permutation Number
+//////////////////////////////////////////////////////////////////////
+//
+//    Another way to calculate Permutation Number
+//
+//////////////////////////////////////////////////////////////////////
 template<int M, int N> struct OTHER_PERMU
 {
 	enum class v : int64_t { val = M*static_cast<int64_t>(OTHER_PERMU<M - 1, N - 1>::v::val) };
@@ -436,6 +488,15 @@ template<int M> struct OTHER_PERMU<M, 0>
 
 
 
+//------------------------------------------- Seperator Line ---------------------------------------------------------------
+
+
+
+//////////////////////////////////////////////////////////////////////
+//
+//    Calculate the N-th Fibonacci Number
+//
+//////////////////////////////////////////////////////////////////////
 template<int N> struct FIBONACCI
 {
 	enum class v : int64_t { val = static_cast<int64_t>(FIBONACCI<N - 1>::v::val) + static_cast<int64_t>(FIBONACCI<N - 2>::v::val) };
@@ -451,6 +512,15 @@ template<> struct FIBONACCI<0>
 
 
 
+//------------------------------------------- Seperator Line ---------------------------------------------------------------
+
+
+
+//////////////////////////////////////////////////////////////////////
+//
+//    Calculate N!
+//
+//////////////////////////////////////////////////////////////////////
 template<int N> struct FACTORIAL
 {
 	enum class v : int64_t { val = N * static_cast<int64_t>(FACTORIAL<N-1>::v::val) };
@@ -460,14 +530,73 @@ template<> struct FACTORIAL<0>
 	enum class v { val = 1 };
 };
 
-template<int M, int N> struct ACCUMULATE
+
+
+//------------------------------------------- Seperator Line ---------------------------------------------------------------
+
+
+
+//////////////////////////////////////////////////////////////////////
+//
+//    Calcualte the sum from M to N
+//
+//////////////////////////////////////////////////////////////////////
+template<int X, int Y, bool X_GT_Y = M_GT_N<X, Y>::val> struct ACCUMULATE
 {
-	enum class v : int64_t { val = M + static_cast<int64_t>(ACCUMULATE<M + 1, N>::v::val) };
+	enum class v : int64_t { val = 0 };
 };
-template<int N> struct ACCUMULATE<N, N>
+template<int X, int Y> struct ACCUMULATE<X, Y, false>
 {
-	enum class v { val = N };
+	enum class v : int64_t { val = X + static_cast<int64_t>(ACCUMULATE<X + 1, Y, false>::v::val) };
 };
+template<int X, int Y> struct ACCUMULATE<X, Y, true>
+{
+	enum class v : int64_t { val = X + static_cast<int64_t>(ACCUMULATE<X-1, Y, true>::v::val) };
+};
+template<int Y> struct ACCUMULATE<Y, Y, false>
+{
+	enum class v { val = Y };
+};
+template<int Y> struct ACCUMULATE<Y, Y, true>
+{
+	enum class v { val = Y };
+};
+
+
+
+//------------------------------------------- Seperator Line ---------------------------------------------------------------
+
+
+
+//////////////////////////////////////////////////////////////////////
+//
+//    Find the Greatest Common Divisor of two integers
+//
+//////////////////////////////////////////////////////////////////////
+template<int X, int Y, bool X_GT_Y=M_GT_N<X, Y>::val> struct FIND_GCD
+{
+	enum {val = 1};
+};
+template<int X, int Y> struct FIND_GCD<X, Y, false>
+{
+	enum {val = FIND_GCD<Y%X, X, false>::val};
+};
+template<int Y> struct FIND_GCD<0, Y, false>
+{
+	enum {val = Y};
+};
+
+template<int X, int Y> struct FIND_GCD<X, Y, true>
+{
+	enum {val = FIND_GCD<Y, X%Y, true>::val};
+};
+template<int X> struct FIND_GCD<X, 0, true>
+{
+	enum {val = X};
+};
+
+
+
 
 int main(void)
 {
@@ -483,6 +612,13 @@ int main(void)
 	std::cout << "Fibonacci(50) is : " << static_cast<int64_t>(FIBONACCI<50>::v::val) << std::endl;
 	std::cout << "Factorial(13) is : " << static_cast<int64_t>(FACTORIAL<13>::v::val) << std::endl;
 	std::cout << "Accumulation(3, 100) is : " << static_cast<int64_t>(ACCUMULATE<3, 100>::v::val) << std::endl;
+	std::cout << "Accumulation(100, 3) is : " << static_cast<int64_t>(ACCUMULATE<100, 3>::v::val) << std::endl;
+	
+	std::cout << "Greatest Common Divisor of " << 13*5 << " and " << 13*7 << " is: " << FIND_GCD<13*5, 13*7>::val << std::endl;
+	std::cout << "Greatest Common Divisor of " << 13*7 << " and " << 13*5 << " is: " << FIND_GCD<13*7, 13*5>::val << std::endl;
+
+	std::cout << "Greatest Common Divisor of " << 97*13 << " and " << 97*41 << " is: " << FIND_GCD<97*13, 97*41>::val << std::endl;
+	std::cout << "Greatest Common Divisor of " << 97*41 << " and " << 97*13 << " is: " << FIND_GCD<97*41, 97*13>::val << std::endl;
 
 	return 0;
 }
