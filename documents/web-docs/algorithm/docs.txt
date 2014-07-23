@@ -4,9 +4,29 @@ http://www.jjj.de/fft/fftpage.html
 *****
 
 
+Are there any better methods to do permutation of string?
+http://stackoverflow.com/questions/1995328/are-there-any-better-methods-to-do-permutation-of-string
+*****
+
+
+C++: Combination Algorithm
+http://stackoverflow.com/questions/24598323/c-combination-algorithm
+*****
+
+
+Permutations of list of lists
+http://stackoverflow.com/questions/24594313/permutations-of-list-of-lists
+*****
+
+
 Fast permutation -> number -> permutation mapping algorithms
 http://stackoverflow.com/questions/1506078/fast-permutation-number-permutation-mapping-algorithms
 *****
+
+
+Generating permutations of a set (most efficiently)
+http://stackoverflow.com/questions/11208446/generating-permutations-of-a-set-most-efficiently
+
 
 
 What is the big-O complexity of this naive code to compute combinations?
@@ -33,6 +53,9 @@ How to implement classic sorting algorithms in modern C++?
 http://stackoverflow.com/questions/24650626/how-to-implement-classic-sorting-algorithms-in-modern-c
 http://coliru.stacked-crooked.com/a/d3957b5f147c146e
 *****
+
+
+
 
 
 

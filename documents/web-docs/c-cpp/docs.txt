@@ -35,6 +35,11 @@ http://stackoverflow.com/questions/1903954/is-there-a-standard-sign-function-sig
 
 
 
+Can someone explain this template code that gives me the size of an array?
+http://stackoverflow.com/questions/437150/can-someone-explain-this-template-code-that-gives-me-the-size-of-an-array?rq=1
+
+
+
 *****
 generic-template-for-calling-function-with-vector-elements
 http://stackoverflow.com/questions/17114213/generic-template-for-calling-function-with-vector-elements
@@ -82,6 +87,6 @@ int main()
 
 
 
-
-
+Can't use enum class as unordered_map key
+http://stackoverflow.com/questions/18837857/cant-use-enum-class-as-unordered-map-key
 
