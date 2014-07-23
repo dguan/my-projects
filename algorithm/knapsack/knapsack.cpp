@@ -2,9 +2,9 @@
 #include <vector>
 #include <limits>
 #include <algorithm>
+#include <numeric>
 #include <exception>
 #include <stdexcept>
-
 using namespace std;
 
 /* ------------------ problem 1: knapsack problem ---------------- */
@@ -24,17 +24,53 @@ const int value[N] = { 5, 8, 10, 8, 45, 20, 31, 39, 4, 10 };
 typedef struct item {
 	int w;
 	int v;
-	item() : w(0), v(0) {};
+	item() = default;// : w(0), v(0) {};
 	item(int _w, int _v) : w(_w), v(_v) {};
 }Item;
 
+// Naive recursive solution of the knapsack problem, complexity is O(2^n)
+vector<Item> knapsack_recur(const vector<Item>& items, int bag_limit)
+{
+	vector<Item> result;
+	if (items.size() == 1)
+	{
+		if (items[0].w <= bag_limit)
+			result.push_back(items[0]);
+		return result;
+	}
+	vector<Item> copy = items;
+	Item cur_item = copy[0];
+	copy.erase(copy.begin());
+	if (cur_item.w > bag_limit)
+		result = knapsack_recur(copy, bag_limit);
+	else
+	{
+		vector<Item> result1 = knapsack_recur(copy, bag_limit - cur_item.w);
+		vector<Item> result2 = knapsack_recur(copy, bag_limit);
+		int value1 = std::accumulate(result1.begin(), result1.end(), cur_item.v, [&](int a, const Item& x) { return a + x.v; });
+		int value2 = std::accumulate(result2.begin(), result2.end(), 0, [&](int a, const Item& x) { return a + x.v; });
+
+		if (value1 > value2)
+		{
+			result = result1;
+			result.push_back(cur_item);
+		}
+		else
+			result = result2;
+	}
+	return result;
+}
+
+
+
+// Dynamic Programming solution of the knapsack problem, complexity O(n^2)
 vector<Item> knapsack(const vector<Item>& items, int bag_limit)
 {
 	vector< vector<int> > results(items.size());
-	for (unsigned int i = 0u; i<results.size(); ++i)
+	for (auto i = 0u; i<results.size(); ++i)
 		results[i].resize(bag_limit + 1);
 
-	for (unsigned int i = 0u; i<items.size(); i++)
+	for (auto i = 0u; i<items.size(); i++)
 	{
 		for (int j = 1; j <= bag_limit; j++)
 		{
@@ -64,11 +100,13 @@ vector<Item> knapsack(const vector<Item>& items, int bag_limit)
 	return items_in_knapsack;
 }
 
+// This knapsack solution's time complexity is still O(n^2), but it has only O(n) space complexity.
+// As a price, it can not keep track of the item information, only the maximum value ......
 int knapsack_1(const vector<Item>& items, int bag_limit)
 {
 	vector<int> vals(bag_limit + 1);
 
-	for (unsigned int i = 0u; i<items.size(); ++i)
+	for (auto i = 0u; i<items.size(); ++i)
 	{
 		for (int j = bag_limit; j >= 1; --j)
 		{
@@ -104,10 +142,10 @@ vector<Stick> cut_stick(const vector<Stick>& sticks, int total_length)
 	vector<Stick> result;
 
 	vector< vector<int> > vals(sticks.size() + 1);
-	for (unsigned int i = 0; i<vals.size(); ++i)
+	for (auto i = 0u; i<vals.size(); ++i)
 		vals[i].resize(total_length + 1);
 
-	for (unsigned int i = 1; i <= sticks.size(); ++i)
+	for (auto i = 1u; i <= sticks.size(); ++i)
 	{
 		for (int j = 1; j <= total_length; ++j)
 		{
@@ -125,7 +163,7 @@ vector<Stick> cut_stick(const vector<Stick>& sticks, int total_length)
 	int max_val_idx = total_length;
 	while (max_val != 0)
 	{
-		for (unsigned int i = 0; i<sticks.size(); ++i)
+		for (auto i = 0u; i<sticks.size(); ++i)
 		{
 			if (vals[sticks.size()][max_val_idx - sticks[i].length] == max_val - sticks[i].value)
 			{
@@ -143,7 +181,7 @@ vector<Stick> cut_stick1(const vector<Stick>& sticks, int total_length, int& max
 {
 	vector<int> vals(total_length + 1);
 
-	for (unsigned int i = 0; i<sticks.size(); ++i)
+	for (auto i = 0u; i<sticks.size(); ++i)
 	{
 		for (int j = 1; j <= total_length; ++j)
 		{
@@ -162,7 +200,7 @@ vector<Stick> cut_stick1(const vector<Stick>& sticks, int total_length, int& max
 	int max_val_idx = total_length;
 	while (max_val != 0)
 	{
-		for (unsigned int i = 0; i<sticks.size(); ++i)
+		for (auto i = 0u; i<sticks.size(); ++i)
 		{
 			if (vals[max_val_idx - sticks[i].length] == max_val - sticks[i].value)
 			{
@@ -220,38 +258,55 @@ int LIS(int data[], int len)
 }
 
 
+
+
 int main(void)
 {
 	vector<Item> its;
 	for (int i = 0; i<N; ++i)
 		its.push_back(Item(weight[i], value[i]));
 
+
+	// recursive solution
+	vector<Item> max_val_items_recur = knapsack_recur(its, W);
+
+	int max_val_recur = 0;
+	for (auto i = 0u; i<max_val_items_recur.size(); ++i)
+		max_val_recur += max_val_items_recur[i].v;
+
+	for (auto i = 0u; i<max_val_items_recur.size(); ++i)
+		cout << "[" << max_val_items_recur[i].w << ", " << max_val_items_recur[i].v << "] - ";
+	cout << endl << "Max value returned by naive Recursive Function is: " << max_val_recur << endl << endl;
+
+
+
 	vector<Item> max_val_items = knapsack(its, W);
 
 	int max_val = 0;
-	for (unsigned int i = 0; i<max_val_items.size(); ++i)
+	for (auto i = 0u; i<max_val_items.size(); ++i)
 		max_val += max_val_items[i].v;
 
-	for (unsigned int i = 0; i<max_val_items.size(); ++i)
+	for (auto i = 0u; i<max_val_items.size(); ++i)
 		cout << "[" << max_val_items[i].w << ", " << max_val_items[i].v << "] - ";
-	cout << endl << "Max value is: " << max_val << endl;
+	cout << endl << "Max value returned by Dynamic Programming is: " << max_val << endl;
 
 	max_val = knapsack_1(its, W);
 	cout << endl << "Max value returned by knapsack_1 is: " << max_val << endl << endl;
 
 	vector<Stick> sticks;
-	for (unsigned int i = 0; i<sizeof(_len_list) / sizeof(_len_list[0]); ++i)
+	for (auto i = 0u; i<sizeof(_len_list) / sizeof(_len_list[0]); ++i)
 		sticks.push_back(Stick(_len_list[i], _val_list[i]));
 
 	vector<Stick> cut = cut_stick(sticks, TotalLength);
 
 	cut = cut_stick1(sticks, TotalLength, max_val);
 	cout << "Maximum cutting value is: " << max_val << endl;
-	for (unsigned int i = 0; i<cut.size(); ++i)
+	for (auto i = 0u; i<cut.size(); ++i)
 		cout << "[" << cut[i].length << ", " << cut[i].value << "]  ";
-	cout << endl;
+	cout << endl << endl;
 
 	cout << "The longest Increasing Sequence's length is: " << LIS(seq, sizeof(seq) / sizeof(seq[0])) << endl;
+
 	return 0;
 }
 
