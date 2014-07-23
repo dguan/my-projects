@@ -1,0 +1,1 @@
+Implementation of a complex number class, and the normal complex number FFT algorithm. The complex number class has the advantage of dealing with both cartesian and polar coordinate systems. The code is quite old though, need to be improved in class structure and design, and to be modernized with new C++11 features, ......later.

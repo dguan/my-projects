@@ -312,6 +312,7 @@ int main(void)
 
 #include <iostream>
 #include <cstdint>
+#include <limits>
 
 /////////////////////////////////////////////////////////////////
 //
@@ -597,9 +598,25 @@ template<int X> struct FIND_GCD<X, 0, true>
 
 
 
+//------------------------------------------- Seperator Line ---------------------------------------------------------------
+
+
+
+//////////////////////////////////////////////////////////////////////
+//
+//    Find the Greatest Common Divisor of two integers
+//
+//////////////////////////////////////////////////////////////////////
+template<int N> struct N_BITS { enum {val = 1 + N_BITS<N/2>::val}; };
+template<> struct N_BITS<0> { enum {val = 0}; };
+
+
 
 int main(void)
 {
+	std::cout << "Maximum value of int64_t is: " << std::numeric_limits<int64_t>::max() << std::endl;
+	std::cout << "Maximum value of long long is: " << std::numeric_limits<long long>::max() << std::endl << std::endl;
+
 	std::cout << "MATRIX_PATH_CNT(6, 3) is: " << static_cast<int64_t>(MATRIX_PATH_CNT<3, 6>::v::val) << ", " << static_cast<int64_t>(OTHER_MATRIX_PATH_CNT<6, 3>::v::val) << std::endl;
 	std::cout << "CATALAN(20, 20) is: " << static_cast<int64_t>(CATALAN<20, 20, false>::v::val) << ", " << static_cast<int64_t>(OTHER_CATALAN<20>::v::val) << std::endl;
 
@@ -610,7 +627,7 @@ int main(void)
 		<< static_cast<int64_t>(FACTORIAL<15>::v::val) / static_cast<int64_t>(FACTORIAL<15-13>::v::val) << std::endl;
 
 	std::cout << "Fibonacci(50) is : " << static_cast<int64_t>(FIBONACCI<50>::v::val) << std::endl;
-	std::cout << "Factorial(13) is : " << static_cast<int64_t>(FACTORIAL<13>::v::val) << std::endl;
+	std::cout << "Factorial(13) is : " << static_cast<int64_t>(FACTORIAL<21>::v::val) <<std::endl;
 	std::cout << "Accumulation(3, 100) is : " << static_cast<int64_t>(ACCUMULATE<3, 100>::v::val) << std::endl;
 	std::cout << "Accumulation(100, 3) is : " << static_cast<int64_t>(ACCUMULATE<100, 3>::v::val) << std::endl;
 	
@@ -619,6 +636,8 @@ int main(void)
 
 	std::cout << "Greatest Common Divisor of " << 97*13 << " and " << 97*41 << " is: " << FIND_GCD<97*13, 97*41>::val << std::endl;
 	std::cout << "Greatest Common Divisor of " << 97*41 << " and " << 97*13 << " is: " << FIND_GCD<97*41, 97*13>::val << std::endl;
+
+	std::cout << "Number 1023, 1024, 1025 must have at least " << N_BITS<1023>::val << ", " << N_BITS<1024>::val << ", " << N_BITS<1025>::val << " bits to represent them respectively." << std::endl;
 
 	return 0;
 }
