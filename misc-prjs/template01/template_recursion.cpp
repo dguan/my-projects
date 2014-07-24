@@ -604,7 +604,8 @@ template<int X> struct FIND_GCD<X, 0, true>
 
 //////////////////////////////////////////////////////////////////////
 //
-//    Find the Greatest Common Divisor of two integers
+//    Find the Most Significant Bit of an integer, for example,
+//    31 is 2^5 -1, its MSB is 4, whereas 32 and 33's MSB are both 5.
 //
 //////////////////////////////////////////////////////////////////////
 template<int N> struct N_BITS { enum {val = 1 + N_BITS<N/2>::val}; };

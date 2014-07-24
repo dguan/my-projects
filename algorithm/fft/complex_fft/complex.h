@@ -6,26 +6,30 @@
 #include <iostream>
 
 static const double PI = 3.1415926536;
-static const double epsilon=1e-8;
 
 class Complex
 {
+private:
 	double real;
 	double img;
 	bool is_polar;
-
-#define IsZero(x) 	( (bool)((x)<epsilon && (x)>(-epsilon)) )
-
+	double epsilon;
+	
+	#define IsZero(x) ((bool) ((x)<epsilon && (x)>(-epsilon)))
 	void check_zero(void);
+
 public:
-	//Complex() : real(0.0), img(0.0), is_polar(false) {};
-	Complex() = default;
+	Complex() : real(0.0), img(0.0), is_polar(false), epsilon(1e-8) {};
+	
+	// If use this default c-tor, this class can be trivially constructible and trivially default constructible.
+	// Anyway, we still have the trivially copyability. 
+	//Complex() = default;
 
 	//no explicit here, otherwise you cannot use codes like Complex X=32; etc.
 	//Complex(int r) : real(r), img(0.0), is_polar(false) {};
-	Complex(double r) : real(r), img(0.0), is_polar(false) { check_zero(); };
+	Complex(double r) : real(r), img(0.0), is_polar(false), epsilon(1e-8) { check_zero(); };
 
-	Complex(double r, double i, bool polar=false) : real(r), img(i), is_polar(polar)
+	Complex(double r, double i, bool polar=false, double precision=1e-8) : real(r), img(i), is_polar(polar), epsilon(precision)
 	{ if(is_polar) assert(real>0.0); check_zero(); };
 
 	//this constructor not used yet, just comment it out and keep it here
@@ -128,6 +132,8 @@ inline const Complex& Complex::operator = (const Complex& a)
 	is_polar = a.IsPolar();
 	real = (is_polar ? a.get_rho():a.get_real());
 	img = (is_polar ? a.get_theta():a.get_img());
+	if(epsilon > a.epsilon)
+		epsilon = a.epsilon;
 
 	return *this;
 }
@@ -142,12 +148,12 @@ inline const bool Complex::operator == (const Complex& a) const
 
 inline const Complex Complex::operator -() const
 {
-	return (is_polar ? Complex(real, PI+img, true):Complex(-real, -img));
+	return (is_polar ? Complex(real, PI+img, true):Complex(-real, -img, false));
 }
 
 const Complex Complex::operator +(const Complex& a) const
 {
-	Complex temp(get_real()+a.get_real(), get_img()+a.get_img());
+	Complex temp(get_real()+a.get_real(), get_img()+a.get_img(), false);
 	if(is_polar)
 		temp.to_polar();
 	return temp;
@@ -155,7 +161,7 @@ const Complex Complex::operator +(const Complex& a) const
 
 const Complex Complex::operator -(const Complex& a) const
 {
-	Complex temp(get_real()-a.get_real(), get_img()-a.get_img());
+	Complex temp(get_real()-a.get_real(), get_img()-a.get_img(), false);
 	if(is_polar)
 		temp.to_polar();
 	return temp;
@@ -168,7 +174,7 @@ const Complex Complex::operator *(double a) const
 	if(is_polar)
 		return Complex(get_rho()*a, get_theta(), true);
 	else
-		return Complex(get_real()*a, get_img()*a);
+		return Complex(get_real()*a, get_img()*a, false);
 }
 
 const Complex Complex::operator *(const Complex& a) const
@@ -176,7 +182,7 @@ const Complex Complex::operator *(const Complex& a) const
 	if(is_polar)
 		return Complex(get_rho()*a.get_rho(), get_theta()+a.get_theta(), true);
 	else
-		return Complex(get_real()*a.get_real()-get_img()*a.get_img(), get_real()*a.get_img()+get_img()*a.get_real());
+		return Complex(get_real()*a.get_real()-get_img()*a.get_img(), get_real()*a.get_img()+get_img()*a.get_real(), false);
 }
 
 const Complex Complex::operator /(double a) const
@@ -186,7 +192,7 @@ const Complex Complex::operator /(double a) const
 	if(is_polar)
 		return Complex(get_rho()/a, get_theta(), true);
 	else
-		return Complex(get_real()/a, get_img()/a);
+		return Complex(get_real()/a, get_img()/a, false);
 }
 
 const Complex Complex::operator /(const Complex& a) const

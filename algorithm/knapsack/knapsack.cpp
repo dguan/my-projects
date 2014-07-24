@@ -38,7 +38,7 @@ vector<Item> knapsack_recur(const vector<Item>& items, int bag_limit)
 			result.push_back(items[0]);
 		return result;
 	}
-	vector<Item> copy = items;
+	vector<Item> copy = std::move(items);
 	Item cur_item = copy[0];
 	copy.erase(copy.begin());
 	if (cur_item.w > bag_limit)
