@@ -111,7 +111,6 @@ std::vector<std::vector<std::vector<int>>> get_multi_comb_idx(int *grp_cnts, int
 		{
 			for (auto vi : combination_idx_nr(grp_cnts[0], combo_cnt))
 				results.push_back(std::vector<std::vector<int>>(1, vi));
-			return results;
 		}
 	}
 	else if (combo_cnt == 0)
@@ -144,6 +143,71 @@ std::vector<std::vector<std::vector<int>>> get_multi_comb_idx(int *grp_cnts, int
 	return results;
 }
 
+
+/*
+    Well, I suppose you were shocked by the scaring vector<vector<vector<int>>> declaration of the get_multi_comb_idx(),
+    this one is a little bit better, ...... vector<vector<int>>. This one uses one bit of the integer to present
+    one index in the group. So, obviously, the group cannot have more items than the bits in the integer, usually
+    32 bits for an unsigned integer, or 64 bits for an int64_t. This should be quite enough for most circumstances.
+*/
+
+std::vector<std::vector<int>> get_multi_comb_idx_bits(int *grp_cnts, int num_grps, int combo_cnt)
+{
+	std::vector<std::vector<int>> results;
+
+	if (num_grps == 1)
+	{
+		if (combo_cnt == 0)
+			results.push_back(std::vector<int>(1, 0));
+		else if (grp_cnts[0] >= combo_cnt)
+		{
+			for (auto vi : combination_idx_nr(grp_cnts[0], combo_cnt))
+			{
+				int this_grp_comb = 0;
+				for(int i : vi)
+					this_grp_comb |= (1 << i);
+				results.push_back(std::vector<int>(1, this_grp_comb));
+			}
+		}
+	}
+	else if (combo_cnt == 0)
+	{
+		std::vector<int> temp;
+		for (int i = 0; i < num_grps; ++i)
+			temp.push_back(0);
+		results.push_back(std::move(temp));
+		return results;
+	}
+	else
+	{
+		for (int i = std::min(combo_cnt, grp_cnts[0]); i >= 0; --i)
+		{
+			std::vector<std::vector<int>> comb_0;
+			if (i == 0)
+				comb_0.push_back(std::vector<int>());
+			else
+				comb_0 = combination_idx_nr(grp_cnts[0], i);
+				
+			for (auto c : comb_0)
+			{
+				int grp_cnt_0 = 0;
+				for(int i : c)
+					grp_cnt_0 |= (1<<i);
+				for (auto vi : get_multi_comb_idx_bits(grp_cnts + 1, num_grps - 1, combo_cnt - i))
+				{
+					vi.insert(vi.begin(), grp_cnt_0);
+					results.push_back(std::move(vi));
+				}
+			}
+		}
+	}
+	return results;
+}
+
+
+
+
+
 int main()
 {
 	int cnts_arr1[] = { 1, 2, 3, 1 };
@@ -166,6 +230,21 @@ int main()
 			std::cout << "[ ";
 			for (auto i : vi)
 				std::cout << i << "  ";
+			std::cout << "];  ";
+		}
+		std::cout << std::endl;
+	}
+	std::cout << std::endl;
+
+	std::vector<std::vector<int>> multi_idxs_bits = get_multi_comb_idx_bits(cnts_arr2, 3, 3);
+	for (auto vi : multi_idxs_bits)
+	{
+		for (auto i : vi)
+		{
+			std::cout << "[ ";
+			for (unsigned int idx = 0; idx<8*sizeof(int); ++idx)
+				if(i & (1 << idx))
+					std::cout << idx << "  ";
 			std::cout << "];  ";
 		}
 		std::cout << std::endl;
