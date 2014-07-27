@@ -1,6 +1,9 @@
 #include "combination.h"
 #include <iostream>
 #include <string>
+#include <vector>
+#include <numeric>
+#include <algorithm>
 #include <cstring>
 #include <chrono>
 
@@ -53,6 +56,28 @@ int main()
 		++cnt;
 	} while (cs.prev_comb_seq());
 	std::cout << "Altogether " << cnt << " combinations" << std::endl << std::endl;
+	
+		std::string seq_str("01234");
+	std::string comb_str("0");
+	do {
+		std::cout << comb_str << std::endl;
+	} while(next_combination(seq_str.begin(), seq_str.end(), comb_str.begin(), comb_str.end()));
+
+	std::vector<int> seq_vec(6);
+	std::vector<int> comb_vec(4);
+	//std::iota(seq_vec.begin(), seq_vec.end(), 0);
+	//std::iota(comb_vec.begin(), comb_vec.end(), 0);
+	{
+		int x = 0;
+		std::generate(seq_vec.begin(), seq_vec.end(), [&x]{ ++x;  return x*x; });
+		x = 0;
+		std::generate_n(comb_vec.begin(), comb_vec.size(), [&x]{ ++x; return x*x; });
+	}
+	do {
+		for (int i : comb_vec)
+			std::cout << i << ", ";
+		std::cout << std::endl;
+	} while (next_combination(seq_vec.begin(), seq_vec.end(), comb_vec.begin(), comb_vec.end()));
 
 
 	std::cout << std::endl << "-- benchmarking of C(25, 10)=3268760 vs STL next_permutation P(10, 10)=3628800 --" << std::endl << std::endl;

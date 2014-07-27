@@ -4,10 +4,45 @@
 #include <vector>
 #include <memory>
 #include <algorithm>
+#include <cassert>
 
 int lexi_sn_idx(int n, int k, int comb[]);
 std::vector<int> nth_comb_idx(int lexi_sn);
 
+template<class BiItor>
+bool next_combination(const BiItor seq_first, const BiItor seq_last, BiItor comb_first, BiItor comb_last)	// seq must be sorted
+{
+	int n = std::distance(seq_first, seq_last);
+	int k = std::distance(comb_first, comb_last);
+	assert(n >= k && k > 0);
+
+	BiItor cur_pos = comb_last;
+	--cur_pos;
+	int chg_cnt = 0;
+	while (true)
+	{
+		BiItor cur_val_itor = std::lower_bound(seq_first, seq_last, *cur_pos);
+		++cur_val_itor;
+		if (std::distance(cur_val_itor, seq_last) > chg_cnt)
+		{
+			while (cur_pos != comb_last)
+				*cur_pos++ = *cur_val_itor++;
+			return true;
+		}
+		else
+		{
+			++chg_cnt;
+			if (chg_cnt < k)
+				--cur_pos;
+			else
+			{
+				for (int i = 0; i < k; ++i)
+					*cur_pos++ = i;
+				return false;
+			}
+		}
+	}
+}
 
 class CombIdx
 {
