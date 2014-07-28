@@ -181,7 +181,13 @@ int main()
 	heap_sort_stl(big_arr.begin(), big_arr.end());
 	auto t3 = high_resolution_clock::now();
 	
-	std::cout << "Time of heap_sort and STL algorithm are: " << duration_cast<milliseconds>(t1-t0).count() << " milliseconds and " << duration_cast<milliseconds>(t3-t2).count() << " milliseconds." << std::endl;
+	for(int i=0; i<1000000; ++i)
+		big_arr[i] = distr2(generator);
+	auto t4 = high_resolution_clock::now();
+	std::sort(big_arr.begin(), big_arr.end());
+	auto t5 = high_resolution_clock::now();
+
+	std::cout << "Times of heap_sort, STL heap sort, and std::sort are: " << duration_cast<milliseconds>(t1-t0).count() << " milliseconds, " << duration_cast<milliseconds>(t3-t2).count() << " milliseconds, and " << duration_cast<milliseconds>(t5-t4).count() << " milliseconds." << std::endl;
 
 	return 0;
 }
