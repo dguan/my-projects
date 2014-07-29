@@ -100,6 +100,8 @@ double gl_integration(std::function<double(double)> func, double x_left, double 
 
 int main(void)
 {
+	std::cout.precision(15);
+	
 	std::cout << gl_integration<2>([&](double x) { return x+1; }, -1, 3) << std::endl;
 	std::cout << gl_integration([&](double x) { return x*x-5; }, 1, 3) << std::endl;
 
