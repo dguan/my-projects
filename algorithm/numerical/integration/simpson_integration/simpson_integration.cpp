@@ -3,13 +3,18 @@
 #include <algorithm>
 #include <cmath>
 
-static const int MAX_DIVIDE = 16;
 
 ////////////////////////////////////////////////////////////////////////
 //
 //    Numerical integration using Composite Simpson Rule
 //
 ////////////////////////////////////////////////////////////////////////
+
+// This line does not compile in VS2013, if so, please use the other two instead
+static constexpr int MAX_DIVIDE = 16;
+//static const int MAX_DIVIDE = 16;
+//#define MAX_DIVIDE 16
+
 
 double comp_simpson_integration(std::function<double(double)> func, double x_left, double x_right, int init_divide = 2, double precision = 1e-6)
 {
