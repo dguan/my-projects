@@ -44,6 +44,51 @@ bool next_combination(const BiItor seq_first, const BiItor seq_last, BiItor comb
 	}
 }
 
+template<class BiItor>
+bool next_combination_idx(int n, BiItor comb_first, BiItor comb_last)
+{
+	int k = std::distance(comb_first, comb_last);
+	assert(n >= k && k > 0);
+
+	BiItor cur_pos = comb_last;
+	--cur_pos;
+	int chg_max = n - 1;
+	while (true)
+	{
+		auto cur_idx = *cur_pos + 1;
+		if (chg_max >= cur_idx)
+		{
+			while (cur_pos != comb_last)
+				*cur_pos++ = cur_idx++;
+			return true;
+		}
+		else
+		{
+			if (cur_pos != comb_first)
+			{
+				--cur_pos;
+				--chg_max;
+			}
+			else
+				return false;
+		}
+	}
+}
+
+/*
+std::vector<std::vector<int>> get_all_combs_idx(int n, int k)
+{
+	std::vector<std::vector<int>> all_combs;
+	std::vector<int> cur_comb(k);
+	std::iota(cur_comb.begin(), cur_comb.end(), 0);
+	do {
+		all_combs.push_back(cur_comb);
+	} while (next_combination_idx(n, cur_comb.begin(), cur_comb.end()));
+
+	return all_combs;
+}
+*/
+
 class CombIdx
 {
 public:

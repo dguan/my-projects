@@ -90,3 +90,34 @@ int main()
 Can't use enum class as unordered_map key
 http://stackoverflow.com/questions/18837857/cant-use-enum-class-as-unordered-map-key
 
+
+
+
+Compile Time Loops in C++11 With Trampolines and Exponential Recursion
+http://fendrich.se/blog/2012/11/22/compile-time-loops-in-c-plus-plus-11-with-trampolines-and-exponential-recursion/
+
+
+
+
+Generic Hash function for all STL-containers
+http://stackoverflow.com/questions/6899392/generic-hash-function-for-all-stl-containers
+*****
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

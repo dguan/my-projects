@@ -56,6 +56,37 @@ http://coliru.stacked-crooked.com/a/d3957b5f147c146e
 
 
 
+std::next_permutation Implementation Explanation
+http://stackoverflow.com/questions/11483060/stdnext-permutation-implementation-explanation
+*****
+
+
+
+
+URLs about combination and permutation:
+
+http://stackoverflow.com/questions/127704/algorithm-to-return-all-combinations-of-k-elements-from-n
+
+http://stackoverflow.com/questions/25049552/recursive-functions-for-partitions-stirling-numbers-and-chebyshev-polynomials
+
+http://www.quickperm.org/
+
+http://en.wikipedia.org/wiki/Bell_numbers
+
+http://en.wikipedia.org/wiki/Stirling_number
+
+http://docs.jboss.org/drools/release/latest/optaplanner-docs/html_single/index.html#firstFitDecreasing
+
+http://stackoverflow.com/questions/25042817/how-to-make-a-permutation-that-tailors-output-efficiently
+
+
+
+
+
+
+
+
+
 
 
 
