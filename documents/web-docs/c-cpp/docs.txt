@@ -99,10 +99,28 @@ http://fendrich.se/blog/2012/11/22/compile-time-loops-in-c-plus-plus-11-with-tra
 
 
 
+
+
+
+HASH Related URLs
+
 Generic Hash function for all STL-containers
 http://stackoverflow.com/questions/6899392/generic-hash-function-for-all-stl-containers
 *****
 
+http://stackoverflow.com/questions/9646297/c11-hash-function-for-any-enum-type
+
+http://stackoverflow.com/questions/8027368/are-there-no-specializations-of-stdhash-for-standard-containers?rq=1
+
+http://stackoverflow.com/questions/15103975/my-stdhash-for-stdtuples-any-improvements?rq=1
+
+http://stackoverflow.com/questions/24361884/how-to-specialize-stdhasht-for-user-defined-types?rq=1
+
+http://stackoverflow.com/questions/8157937/how-to-specialize-stdhashkeyoperator-for-user-defined-type-in-unordered
+
+http://stackoverflow.com/questions/14813965/how-to-specialize-stdhash-for-type-from-other-library
+
+http://stackoverflow.com/questions/19655733/how-to-use-unordered-set-that-has-elements-that-are-vector-of-pairint-int?lq=1
 
 
 
@@ -113,11 +131,14 @@ http://stackoverflow.com/questions/6899392/generic-hash-function-for-all-stl-con
 
 
 
+http://stackoverflow.com/questions/25081016/count-different-arrangments
+The problem you are talking about belongs to Graph Theory. You want an algorithm to count maximal Matchings in a Bipartite Graph. The counting itself belongs to the area of Combinatorics.
 
 
 
 
 
 
-
+http://advancedcppwithexamples.blogspot.com.au/
+http://advancedcppwithexamples.blogspot.com.au/2010/11/c-example-of-observer-design-pattern.html?showComment=1351673584363#comment-c2692327415371613861
 

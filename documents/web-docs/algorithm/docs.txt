@@ -82,10 +82,11 @@ http://stackoverflow.com/questions/25042817/how-to-make-a-permutation-that-tailo
 
 
 
+Generating integer partition by its number
+http://stackoverflow.com/questions/20105309/generating-integer-partition-by-its-number
 
 
-
-
+http://en.wikipedia.org/wiki/Partition_(number_theory)
 
 
 
