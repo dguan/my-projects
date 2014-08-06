@@ -93,7 +93,7 @@ int main()
 	for (int i = 0; i < 10; ++i)
 	{
 		std::cout << "******partition of number " << i << std::endl;
-		for (auto vi : partition_inc(i, 1))
+		for (auto vi : partition(i, 1))
 		{
 			for (int x : vi)
 				std::cout << x << ", ";
@@ -103,7 +103,7 @@ int main()
 	}
 
 	std::cout << std::endl << std::endl;
-	for (auto vi : partition_inc(6, 1))
+	for (auto vi : partition(6, 1))
 	{
 		for (int i : vi)
 			std::cout << i << ", ";
@@ -111,7 +111,7 @@ int main()
 	}
 
 	std::cout << std::endl << std::endl;
-	for (auto vi : partition_inc(6, 2))
+	for (auto vi : partition(6, 2))
 	{
 		for (int i : vi)
 			std::cout << i << ", ";
