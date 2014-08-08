@@ -49,6 +49,42 @@ std::vector<std::vector<int>> partition_dec(int N, int cur_max)
 	return results;
 }
 
+std::vector<std::vector<int>> partition_n(int N, int parts, int cur_min)
+{
+	std::vector<std::vector<int>> results;
+	if (parts == 1)
+	{
+		results.emplace_back(1, N);
+		return results;
+	}
+	if (parts == N)
+	{
+		results.emplace_back(N, 1);
+		return results;
+	}
+	for (int i = cur_min; i <= N / parts; ++i)
+	{
+		if (cur_min < i)
+			cur_min = i;
+		for (auto x : partition_n(N - i, parts - 1, cur_min))
+		{
+			x.insert(x.begin(), i);
+			results.push_back(std::move(x));
+		}
+	}
+	return results;
+}
+
+std::vector<std::vector<int>> partition_parts(int N)
+{
+	std::vector<std::vector<int>> results;
+	for (int i = 1; i <= N; ++i)
+		for (auto pn : partition_n(N, i, 1))
+			results.push_back(std::move(pn));
+	return results;
+}
+
+
 template<class CONTAINER=std::vector<int>>
 bool next_partition(CONTAINER& cur_part)
 {
@@ -130,6 +166,19 @@ int main()
 	{
 		std::cout << "*** decremental partition of number " << i << " ***" << std::endl;
 		for (auto vi : partition_dec(i, i))
+		{
+			for (int x : vi)
+				std::cout << x << ", ";
+			std::cout << std::endl;
+		}
+		std::cout << std::endl;
+	}
+
+	std::cout << std::endl;
+	for (int i = 0; i < 10; ++i)
+	{
+		std::cout << "*** partition in parts of number " << i << " ***" << std::endl;
+		for (auto vi : partition_parts(i))
 		{
 			for (int x : vi)
 				std::cout << x << ", ";
