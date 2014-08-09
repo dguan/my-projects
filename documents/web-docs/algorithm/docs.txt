@@ -91,3 +91,60 @@ http://en.wikipedia.org/wiki/Partition_(number_theory)
 
 
 
+
+
+Fastest way to determine if an integer's square root is an integer
+http://stackoverflow.com/questions/295579/fastest-way-to-determine-if-an-integers-square-root-is-an-integer?rq=1
+*****
+
+
+
+calculate 24
+http://rosettacode.org/wiki/24_game/Solve#Python
+
+
+
+
+Relationship between following two recursive methods which generates balanced paranthesized strings (Catalan Number)?
+http://stackoverflow.com/questions/25139789/relationship-between-following-two-recursive-methods-which-generates-balanced-pa
+
+string[] CatalanNumber_AllPossibleParanthesis(int N)
+        {
+            Assert.IsTrue(N >= 0);
+            if(N==0)
+            {
+                return new string[] {" "};
+            }
+            if(N == 1)
+            {
+                return new string[] { "[]" };
+            }
+
+            List<string> results = new List<string>();
+            for (int i = 0; i <= (N - 1); i++)
+            {
+                var r1 = this.CatalanNumber_AllPossibleParanthesis(i);
+                var r2 = this.CatalanNumber_AllPossibleParanthesis(N - 1 - i);
+
+                foreach (var s1 in r1)
+                {
+                    foreach (var s2 in r2)
+                    {
+                        //[c']c" - will be of the form
+                        string r = "[" + s1.Trim() + "]" + s2.Trim();
+                        results.Add(r);
+                    }
+                }
+            }
+            return results.ToArray();
+        }
+
+
+
+
+
+
+
+
+
+

@@ -142,3 +142,33 @@ The problem you are talking about belongs to Graph Theory. You want an algorithm
 http://advancedcppwithexamples.blogspot.com.au/
 http://advancedcppwithexamples.blogspot.com.au/2010/11/c-example-of-observer-design-pattern.html?showComment=1351673584363#comment-c2692327415371613861
 
+
+
+
+c11-does-not-deduce-type-when-stdfunction-or-lambda-functions-are-involved
+http://stackoverflow.com/questions/9998402/c11-does-not-deduce-type-when-stdfunction-or-lambda-functions-are-involved
+
+
+
+C++ - Efficient way to generate random bitset with configurable mean ¡°1s to 0s¡± ratio
+http://stackoverflow.com/questions/25176423/c-efficient-way-to-generate-random-bitset-with-configurable-mean-1s-to-0s
+
+
+
+Fastest way to determine if an integer's square root is an integer
+http://stackoverflow.com/questions/295579/fastest-way-to-determine-if-an-integers-square-root-is-an-integer?rq=1
+*****
+
+
+
+
+
+
+
+
+
+
+
+
+
+

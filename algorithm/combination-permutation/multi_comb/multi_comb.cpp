@@ -149,6 +149,9 @@ std::vector<std::vector<std::vector<int>>> get_multi_comb_idx(int *grp_cnts, int
     this one is a little bit better, ...... vector<vector<int>>. This one uses one bit of the integer to present
     one index in the group. So, obviously, the group cannot have more items than the bits in the integer, usually
     32 bits for an unsigned integer, or 64 bits for an int64_t. This should be quite enough for most circumstances.
+	Ideally, this algorithm could have been implemented using bitset, but, STL has only fixed length bitset, although
+	Boost library has a nice dynamic_bitset, I would rather leave not to introduce another library into this code,
+	so, just implement it as is using integers, until future new C++ standard introduce its own dynamic bitset.
 */
 
 std::vector<std::vector<int>> get_multi_comb_idx_bits(int *grp_cnts, int num_grps, int combo_cnt)
