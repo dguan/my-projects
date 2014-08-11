@@ -115,28 +115,28 @@ std::string find_solution(const state& cur_state, std::vector<state>& used_state
 int main(void)
 {
 	const int num_missionaries = 3;
-	const int num_cannibles = 3;
+	const int num_cannibals = 3;
 	//const int num_missionaries = 100;
-	//const int num_cannibles = 99;
+	//const int num_cannibals = 99;
 
-	if (num_missionaries < 0 || num_cannibles < 0 || (num_missionaries != 0 && num_missionaries < num_cannibles))
+	if (num_missionaries < 0 || num_cannibals < 0 || (num_missionaries != 0 && num_missionaries < num_cannibals))
 	{
-		std::cout << "The number of missionaries and the number of cannibles must not be negative," << std::endl;
-		std::cout << "and, the number of missionaries must not be less than the number of cannibles." << std::endl;
+		std::cout << "The number of missionaries and the number of cannibals must not be negative," << std::endl;
+		std::cout << "and, the number of missionaries must not be less than the number of cannibals." << std::endl;
 		return 1;
 	}
-	else if (num_missionaries + num_cannibles < 2)
+	else if (num_missionaries + num_cannibals < 2)
 	{
 		if (num_missionaries)
 			std::cout << " m";
-		if (num_cannibles)
+		if (num_cannibals)
 			std::cout << " b";
 		std::cout << "-> " << std::endl;
 	}
 	else
 	{
 		std::vector<state> used_states;
-		std::cout << find_solution(state(num_missionaries, num_cannibles, 0, 0, false, ""), used_states) << std::endl;
+		std::cout << find_solution(state(num_missionaries, num_cannibals, 0, 0, false, ""), used_states) << std::endl;
 	}
 	return 0;
 }

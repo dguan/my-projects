@@ -1,0 +1,1 @@
+Implementation of Composite Simpson Integration, and the comparison with Gauss-Legendre integration. There are some more detaied description in the source code's comments, please refer to the source code for it. Also I checked the NAN behavious of g++ v8.4 and VS2013.

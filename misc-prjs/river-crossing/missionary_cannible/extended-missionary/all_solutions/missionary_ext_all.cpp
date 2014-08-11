@@ -108,36 +108,36 @@ std::vector<std::vector<int>> get_multi_comb_idx_bits(int *grp_cnts, int num_grp
 // DFS has only 30 solutions, while BFS has 8100!
 // Make sure to have the 2 tables sorted first!
 const std::vector<int> missionaries{ 4, 5, 6 };
-const std::vector<int> cannibles{ 1, 2, 3 };
+const std::vector<int> cannibals{ 1, 2, 3 };
 const int boat_volume = 2;
 
 // Both DFS and BFS give out correct answer 28, but, DFS solutions
 // increased to 264, while BFS solutions jumped to 944784! So it will
 // take tons of time even to print all these solutions.
 //const std::vector<int> missionaries{ 4, 5, 6, 7 };
-//const std::vector<int> cannibles{ 2, 3, 5 };
+//const std::vector<int> cannibals{ 2, 3, 5 };
 //const int boat_volume = 2;
 
 // There is no solution when M=C=4 and boat_volume=2
 //const std::vector<int> missionaries{ 6, 8, 10, 12 };
-//const std::vector<int> cannibles{ 3, 5, 7, 9 };
+//const std::vector<int> cannibals{ 3, 5, 7, 9 };
 //const int boat_volume = 2;
 
 // Never run BFS algorithm on this!
 // Best time 11, 368 DFS solutions.
 //const std::vector<int> missionaries{ 2, 4, 5, 6 };
-//const std::vector<int> cannibles{ 1, 2, 3, 4 };
+//const std::vector<int> cannibals{ 1, 2, 3, 4 };
 //const int boat_volume = 3;
 
 // Total 1584 DFS solutions, best time 15
 //const std::vector<int> missionaries{ 2, 4, 5, 6, 8 };
-//const std::vector<int> cannibles{ 1, 2, 3, 4, 5 };
+//const std::vector<int> cannibals{ 1, 2, 3, 4, 5 };
 //const int boat_volume = 3;
 
 // Total 73086 DFS solutions, best time 9, one of the best solution is:
 // m2m4c1c2-> m2c1<- m2m5c1c3-> m2c1<- m2m5c1c4-> m5c1<- m6m8c1c5-> m6c1<- m5m6c1c6->
 //const std::vector<int> missionaries{ 2, 4, 5, 5, 6, 8 };
-//const std::vector<int> cannibles{ 1, 2, 3, 4, 5, 6 };
+//const std::vector<int> cannibals{ 1, 2, 3, 4, 5, 6 };
 //const int boat_volume = 4;
 
 struct state
@@ -157,7 +157,7 @@ typedef std::unordered_map<unsigned long long, int> UsedStateTable;
 
 const int INTEGER_BITS = sizeof(int)* 8;// Total bits in an integer, maximum elements in an integer should be INTEGER_BITS-1
 static int g_Missionary_N;				// number of missionaries
-static int g_Cannible_N;				// number of cannibles, this may be less than the missionaries
+static int g_Cannible_N;				// number of cannibals, this may be less than the missionaries
 
 unsigned char BIT_CNT[256];		// number of ones in a char, used to check ones in integers quickly
 inline void init_bit_cnt_table(unsigned char table[])	// initialize bit-count table
@@ -188,7 +188,7 @@ inline bool solution_found(const state& st, int boat_volume)	// check if we have
 	return (count_ones(st.mLeft)+count_ones(st.cLeft) <= boat_volume) && (st.boat_side == false);
 }
 
-// By checking bit_order, convert the bit index in real order in missionary or cannible table index
+// By checking bit_order, convert the bit index in real order in missionary or cannibal table index
 std::vector<int> bit_index_to_index(unsigned int bit_order, int max_bits, int bit_index)
 {
 	std::vector<int> result;
@@ -279,14 +279,14 @@ std::vector<state> get_safe_movs(const state& st, int boat_volume, const UsedSta
 		if (!m_bit_index.empty())
 			min_m_time = missionaries[m_bit_index[0]];	//because missionaries and m_bit_index are all sorted, so the first is the shortest in time
 		if (!c_bit_index.empty())
-			min_c_time = cannibles[c_bit_index[0]];
+			min_c_time = cannibals[c_bit_index[0]];
 
 		for (int i : m_bit_index)	// move the missionaries from this state to next state
 		{
 			m_from &= (~(1<<i));
 			m_to |= (1 << i);
 		}
-		for (int i : c_bit_index)	// move the cannibles from this state to next state
+		for (int i : c_bit_index)	// move the cannibals from this state to next state
 		{
 			c_from &= (~(1 << i));
 			c_to |= (1 << i);
@@ -311,7 +311,7 @@ std::vector<state> get_safe_movs(const state& st, int boat_volume, const UsedSta
 			for (int i : m_bit_index)
 				mov = mov + 'm' + std::to_string(missionaries[i]);
 			for (int i : c_bit_index)
-				mov = mov + 'c' + std::to_string(cannibles[i]);
+				mov = mov + 'c' + std::to_string(cannibals[i]);
 
 			results.emplace_back(ml, cl, mr, cr, !st.boat_side, st.movs + mov + (st.boat_side ? "<- " : "-> "), st.time + std::min(min_m_time, min_c_time));
 		}
@@ -341,7 +341,7 @@ std::vector<std::tuple<int, std::string>> find_solution_dfs(const state& cur_st,
 		{
 			if (cur_st.cLeft & (1 << i))
 			{
-				int time = cannibles[i];
+				int time = cannibals[i];
 				s = s + 'c' + std::to_string(time);
 				if (time < min_c_time)
 					min_c_time = time;
@@ -416,7 +416,7 @@ std::vector<std::tuple<int, std::string>> find_solution_bfs(std::queue<state>& c
 				{
 					if (gc.cLeft & (1 << i))
 					{
-						int time = cannibles[i];
+						int time = cannibals[i];
 						s = s + 'c' + std::to_string(time);
 						if (time < min_c_time)
 							min_c_time = time;
@@ -459,12 +459,12 @@ int main(void)
 	// Some initialization
 	init_bit_cnt_table(BIT_CNT);
 	g_Missionary_N = missionaries.size();
-	g_Cannible_N = cannibles.size();
+	g_Cannible_N = cannibals.size();
 
 	std::cout << std::endl << "******************** DFS algorithm *********************" << std::endl << std::endl;
 
 	UsedStateTable used_states;
-	auto dfs_solutions = find_solution_dfs(state((1<<missionaries.size())-1, (1<<cannibles.size())-1, 0, 0, false, "", 0), boat_volume, used_states);
+	auto dfs_solutions = find_solution_dfs(state((1<<missionaries.size())-1, (1<<cannibals.size())-1, 0, 0, false, "", 0), boat_volume, used_states);
 
 	std::sort(dfs_solutions.begin(), dfs_solutions.end(), [&](const std::tuple<int, std::string>& a, const std::tuple<int, std::string>& b) { return std::get<0>(a) < std::get<0>(b); });
 	for (auto x : dfs_solutions)
@@ -474,7 +474,7 @@ int main(void)
 
 	std::queue<state> q_states;
 	used_states.clear();
-	q_states.push(state((1<<missionaries.size())-1, (1<<cannibles.size())-1, 0, 0, false, "", 0));
+	q_states.push(state((1<<missionaries.size())-1, (1<<cannibals.size())-1, 0, 0, false, "", 0));
 	auto bfs_solutions = find_solution_bfs(q_states, boat_volume, used_states);
 
 	std::sort(bfs_solutions.begin(), bfs_solutions.end(), [&](const std::tuple<int, std::string>& a, const std::tuple<int, std::string>& b) { return std::get<0>(a) < std::get<0>(b); });

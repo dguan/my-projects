@@ -79,9 +79,9 @@ std::vector<state> get_safe_movs(const state& st, int boat_volume, const std::ve
 	for (auto pc : possible_combos)
 	{
 		int nml = st.boat_side ? st.status[0] + pc[0] : st.status[0] - pc[0];	// num of missionaries on the left side
-		int ncl = st.boat_side ? st.status[1] + pc[1] : st.status[1] - pc[1];	// num of cannibles on the left side
+		int ncl = st.boat_side ? st.status[1] + pc[1] : st.status[1] - pc[1];	// num of cannibals on the left side
 		int nmr = st.boat_side ? st.status[2] - pc[0] : st.status[2] + pc[0];	// num of missionaries on the right side
-		int ncr = st.boat_side ? st.status[3] - pc[1] : st.status[3] + pc[1];	// num of cannibles on the right side
+		int ncr = st.boat_side ? st.status[3] - pc[1] : st.status[3] + pc[1];	// num of cannibals on the right side
 
 		if (!is_safe_mov(nml, ncl, nmr, ncr))
 			continue;
@@ -161,42 +161,42 @@ std::string find_solution_bfs(std::queue<state>& cur_states, std::vector<std::tu
 int main(void)
 {
 	//const int num_missionaries = 3;
-	//const int num_cannibles = 3;
+	//const int num_cannibals = 3;
 	//const int boat_volume = 2;
 	
 	//const int num_missionaries = 6;
-	//const int num_cannibles = 6;
+	//const int num_cannibals = 6;
 	//const int boat_volume = 3;
 
 	const int num_missionaries = 100;
-	const int num_cannibles = 100;
+	const int num_cannibals = 100;
 	const int boat_volume = 4;
 
 	//const int num_missionaries = 100;
-	//const int num_cannibles = 99;
+	//const int num_cannibals = 99;
 	//const int boat_volume = 2;
 
-	if (num_missionaries < 0 || num_cannibles < 0 || (num_missionaries != 0 && num_missionaries < num_cannibles))
+	if (num_missionaries < 0 || num_cannibals < 0 || (num_missionaries != 0 && num_missionaries < num_cannibals))
 	{
-		std::cout << "The number of missionaries and the number of cannibles must not be negative," << std::endl;
-		std::cout << "and, the number of missionaries must not be less than the number of cannibles." << std::endl;
+		std::cout << "The number of missionaries and the number of cannibals must not be negative," << std::endl;
+		std::cout << "and, the number of missionaries must not be less than the number of cannibals." << std::endl;
 		return 1;
 	}
 	else
 	{
 		std::vector<std::tuple<int, int, bool>> used_states;
 		auto t0 = high_resolution_clock::now();
-		std::cout << find_solution_dfs(state(num_missionaries, num_cannibles, 0, 0, false, ""), used_states, boat_volume) << std::endl;
+		std::cout << find_solution_dfs(state(num_missionaries, num_cannibals, 0, 0, false, ""), used_states, boat_volume) << std::endl;
 		auto t1 = high_resolution_clock::now();
-		std::cout << "The DFS solution for (M:" << num_missionaries << ", C:" << num_cannibles << ", BoatVolume:" << boat_volume << ") costs " << duration_cast<milliseconds>(t1-t0).count() << " milliseconds." <<std::endl << std::endl;
+		std::cout << "The DFS solution for (M:" << num_missionaries << ", C:" << num_cannibals << ", BoatVolume:" << boat_volume << ") costs " << duration_cast<milliseconds>(t1-t0).count() << " milliseconds." <<std::endl << std::endl;
 
 		used_states.clear();
 		std::queue<state> q_states;
-		q_states.push(state(num_missionaries, num_cannibles, 0, 0, false, ""));
+		q_states.push(state(num_missionaries, num_cannibals, 0, 0, false, ""));
 		auto t2 = high_resolution_clock::now();
 		std::cout << find_solution_bfs(q_states, used_states, boat_volume) << std::endl;
 		auto t3 = high_resolution_clock::now();
-		std::cout << "The BFS solution for (M:" << num_missionaries << ", C:" << num_cannibles << ", BoatVolume:" << boat_volume << ") costs " << duration_cast<milliseconds>(t3 - t2).count() << " milliseconds." << std::endl << std::endl;
+		std::cout << "The BFS solution for (M:" << num_missionaries << ", C:" << num_cannibals << ", BoatVolume:" << boat_volume << ") costs " << duration_cast<milliseconds>(t3 - t2).count() << " milliseconds." << std::endl << std::endl;
 	}
 	return 0;
 }
