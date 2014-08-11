@@ -15,5 +15,72 @@ One thing to note is that, I made thia program to return ALL possible solutions,
 
 Another thing to note is that, because of the scale of the complexity, when it's not practical to find the optimal solution, I could use some other algorithms to find some nearly-optimal(quasi-optimal) solution, which I am going to cover in following projects.
 
+The output of DFS algorithm is:
+
+******************** DFS algorithm *********************
+
+20 ::  c1c2->  c1<-  c1c3->  c1<-  m4m5->  m4c2<-  m4m6->  c3<-  c1c3->  c1<-  c1c2-> 
+
+20 ::  c1c2->  c1<-  c1c3->  c1<-  m4m5->  m4c2<-  m4m6->  c3<-  c1c2->  c1<-  c1c3-> 
+
+22 ::  c1c2->  c1<-  c1c3->  c1<-  m4m5->  m4c2<-  m4m6->  c3<-  c2c3->  c2<-  c1c2-> 
+
+22 ::  c1c2->  c1<-  c1c3->  c1<-  m4m5->  m4c2<-  m4m6->  c3<-  c1c2->  c2<-  c2c3-> 
+
+23 ::  c1c2->  c1<-  c1c3->  c1<-  m4m5->  m4c2<-  m4m6->  c3<-  c2c3->  c3<-  c1c3-> 
+
+23 ::  c1c2->  c1<-  c1c3->  c1<-  m4m5->  m4c2<-  m4m6->  c3<-  c1c3->  c3<-  c2c3-> 
+
+24 ::  m4c1->  m4<-  c2c3->  c1<-  m4m5->  m4c2<-  m4m6->  c3<-  c1c2->  c1<-  c1c3-> 
+
+24 ::  c1c2->  c1<-  c1c3->  c1<-  m4m5->  m4c2<-  m4m6->  c3<-  c2c3->  m4<-  m4c1-> 
+
+24 ::  m4c1->  m4<-  c2c3->  c1<-  m4m5->  m4c2<-  m4m6->  c3<-  c1c3->  c1<-  c1c2-> 
+
+24 ::  c1c2->  c1<-  c1c3->  c1<-  m4m5->  m4c2<-  m4m6->  c3<-  c1c3->  m4<-  m4c2-> 
+
+25 ::  c1c2->  c1<-  c1c3->  c1<-  m4m5->  m4c2<-  m4m6->  c3<-  c1c2->  m4<-  m4c3-> 
+
+25 ::  c1c2->  c1<-  c1c3->  c1<-  m4m5->  m4c2<-  m4m6->  c3<-  c2c3->  m5<-  m5c1-> 
+
+25 ::  c1c2->  c1<-  c1c3->  c1<-  m4m5->  m4c2<-  m4m6->  c3<-  c1c3->  m5<-  m5c2-> 
+
+26 ::  m4c1->  m4<-  c2c3->  c1<-  m4m5->  m4c2<-  m4m6->  c3<-  c2c3->  c2<-  c1c2-> 
+
+26 ::  c1c2->  c1<-  c1c3->  c1<-  m4m5->  m4c2<-  m4m6->  c3<-  c2c3->  m6<-  m6c1-> 
+
+26 ::  c1c2->  c1<-  c1c3->  c1<-  m4m5->  m4c2<-  m4m6->  c3<-  c1c2->  m5<-  m5c3-> 
+
+26 ::  m4c1->  m4<-  c2c3->  c1<-  m4m5->  m4c2<-  m4m6->  c3<-  c1c2->  c2<-  c2c3-> 
+
+26 ::  c1c2->  c1<-  c1c3->  c1<-  m4m5->  m4c2<-  m4m6->  c3<-  c1c3->  m6<-  m6c2-> 
+
+27 ::  m4c1->  m4<-  c2c3->  c1<-  m4m5->  m4c2<-  m4m6->  c3<-  c2c3->  c3<-  c1c3-> 
+
+27 ::  m4c1->  m4<-  c2c3->  c1<-  m4m5->  m4c2<-  m4m6->  c3<-  c1c3->  c3<-  c2c3-> 
+
+27 ::  c1c2->  c1<-  c1c3->  c1<-  m4m5->  m4c2<-  m4m6->  c3<-  c1c2->  m6<-  m6c3-> 
+
+28 ::  m4c1->  m4<-  c2c3->  c1<-  m4m5->  m4c2<-  m4m6->  c3<-  c2c3->  m4<-  m4c1-> 
+
+28 ::  m4c1->  m4<-  c2c3->  c1<-  m4m5->  m4c2<-  m4m6->  c3<-  c1c3->  m4<-  m4c2-> 
+
+29 ::  m4c1->  m4<-  c2c3->  c1<-  m4m5->  m4c2<-  m4m6->  c3<-  c2c3->  m5<-  m5c1-> 
+
+29 ::  m4c1->  m4<-  c2c3->  c1<-  m4m5->  m4c2<-  m4m6->  c3<-  c1c3->  m5<-  m5c2-> 
+
+29 ::  m4c1->  m4<-  c2c3->  c1<-  m4m5->  m4c2<-  m4m6->  c3<-  c1c2->  m4<-  m4c3-> 
+
+30 ::  m4c1->  m4<-  c2c3->  c1<-  m4m5->  m4c2<-  m4m6->  c3<-  c2c3->  m6<-  m6c1-> 
+
+30 ::  m4c1->  m4<-  c2c3->  c1<-  m4m5->  m4c2<-  m4m6->  c3<-  c1c3->  m6<-  m6c2-> 
+
+30 ::  m4c1->  m4<-  c2c3->  c1<-  m4m5->  m4c2<-  m4m6->  c3<-  c1c2->  m5<-  m5c3-> 
+
+31 ::  m4c1->  m4<-  c2c3->  c1<-  m4m5->  m4c2<-  m4m6->  c3<-  c1c2->  m6<-  m6c3-> 
+
+***** Total 30 DFS solutions *****
+
+The best DFS solution is: 20 ::  c1c2->  c1<-  c1c3->  c1<-  m4m5->  m4c2<-  m4m6->  c3<-  c1c3->  c1<-  c1c2-> 
 
 

@@ -15,5 +15,10 @@ This program will return JUST ONE best solution, from possible multiple best-sol
 
 Another thing to note is that, because of the scale of the complexity, when it's not practical to find the optimal solution, I could use some other algorithms to find some nearly-optimal(quasi-optimal) solution, which I am going to cover in following projects.
 
+The output of DFS algorithm is:
+
+******************** DFS algorithm *********************
+
+The best DFS time is: 15, DFS solution is:  c1c2c3->  c1<-  c1c4c5->  c1c3<-  m2m4m5->  m2c4<-  m2m6m8->  c2<-  c1c2c3->  c1<-  c1c4->
 
 
