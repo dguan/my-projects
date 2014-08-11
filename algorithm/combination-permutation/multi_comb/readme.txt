@@ -1,1 +1,0 @@
-I designed and implemented these 2 algorithms to solve some interesting and complex problems, notably the classic missionary-cannible problem, and the expanded missionary-cannible problem which I thought of after finished the original problem. There are some detailed description and comments in the code.
