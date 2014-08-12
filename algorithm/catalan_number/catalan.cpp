@@ -8,7 +8,11 @@
 
 // Actually there can be many more ways to generate Catalan number, for example using combination formula, etc.
 // If you study wikipedia carefully, you can easily find more ways to get the Catalan number, I only used a few
-// most important (or most useful) methods.  
+//
+// most important (or most useful) methods.
+// The first Catalan numbers for n = 0, 1, 2, 3, … are
+// 1, 1, 2, 5, 14, 42, 132, 429, 1430, 4862, 16796, 58786, 208012, 742900, 2674440, 9694845, 35357670, 129644790,
+// 477638700, 1767263190, 6564120420, 24466267020, 91482563640, 343059613650, 1289904147324, 4861946401452, …   
 
 //
 // Two compile time template Catalan number generators
@@ -76,6 +80,8 @@ unsigned long catalan_number_recursive_2(int M, int N)
 		return catalan_number_recursive_2(M - 1, N);
 	else if (M < N)
 		return catalan_number_recursive_2(M - 1, N) + catalan_number_recursive_2(M, N - 1);
+	else
+		return 0;	// As M should never be > N, this line should never be executed, just to remove the compile time warning
 }
 
 unsigned long catalan_number_dp(int N)
