@@ -286,7 +286,6 @@ template<class unsigned_int_type>
 bool prev_catalan_int(unsigned_int_type& x, int bits_len)
 {
 	unsigned int bit_mask = 0x2;
-	unsigned int max_bit_mask = 1 << bits_len;
 	int one_cnt = 0;
 	while (!(x & bit_mask))
 		bit_mask <<= 1;
