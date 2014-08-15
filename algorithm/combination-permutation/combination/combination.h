@@ -89,6 +89,81 @@ std::vector<std::vector<int>> get_all_combs_idx(int n, int k)
 }
 */
 
+
+////////////////////////////////////////////////////////////////////////////////
+//
+// The following 4 functions have been fully tested in both VS2013 and g++8.4,
+// on signed and unsigned char, short, int, long long integer types, and works fine.
+// This is a copy from the bit_operation projects, only because that these can
+// be used to generate combinations, but the performance is not that fast,
+// actually it is 1 times slower than the above next_combination_idx function.
+//
+////////////////////////////////////////////////////////////////////////////////
+template<class IntType>
+inline IntType first_n_1_int(int n)
+{
+	return static_cast<IntType>((IntType)(-1) >> (sizeof(IntType)*8-n));
+}
+
+template<class IntType>
+inline IntType last_n_1_int(int n)
+{
+	return static_cast<IntType>((signed)((IntType)(-1)) & ~(((IntType)1<<(sizeof(IntType)*8-n))-1));
+}
+
+template<class IntType>
+bool next_n_1_int(IntType& cur_x, int total_bits = sizeof(IntType)* 8)
+{
+	IntType bit_mask = 0x1;
+	int one_cnt = 0;
+	int cnt = 0;
+
+	while (cnt++ < total_bits)
+	{
+		if (cur_x & bit_mask)
+		{
+			if (!(cur_x & (bit_mask << 1)))
+				break;
+			else
+				++one_cnt;
+		}
+		bit_mask <<= 1;
+	}
+	bit_mask <<= 1;
+	if (cnt >= total_bits)
+		return false;
+	cur_x |= bit_mask;
+	cur_x &= ~(bit_mask - 1);
+	cur_x |= ((1 << one_cnt) - 1);
+
+	return true;
+}
+
+template<class IntType>
+bool prev_n_1_int(IntType& cur_x, int total_bits = sizeof(IntType)* 8)
+{
+	IntType bit_mask = 0x1;
+	int one_cnt = 0;
+	int cnt = 0;
+	while (cnt++ < total_bits)
+	{
+		if (cur_x & bit_mask)
+			++one_cnt;
+		else if(cur_x & (bit_mask << 1))
+			break;
+		bit_mask <<= 1;
+	}
+	if (cnt >= total_bits)
+		return false;
+	cur_x ^= (bit_mask << 1);
+	cur_x |= bit_mask;
+	cur_x &= ~(bit_mask - 1);
+	cur_x |= (bit_mask - (bit_mask >> one_cnt));
+
+	return true;
+}
+
+
 class CombIdx
 {
 public:
