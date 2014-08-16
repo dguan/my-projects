@@ -4,6 +4,7 @@
 #include <vector>
 #include <memory>
 #include <algorithm>
+#include <utility>
 #include <cassert>
 
 int lexi_sn_idx(int n, int k, int comb[]);
@@ -161,6 +162,22 @@ bool prev_n_1_int(IntType& cur_x, int total_bits = sizeof(IntType)* 8)
 	cur_x |= (bit_mask - (bit_mask >> one_cnt));
 
 	return true;
+}
+
+// Get the n-th order binomial coefficient using Dynamic Programming
+std::vector<int> binomial_coefficient(int n)
+{
+	std::vector<int> result(n + 1, 1);
+	for (int i = 1; i < n; ++i)
+	{
+		int prev = 1;
+		for (int j = 1; j <= i; ++j)
+		{
+			std::swap(prev, result[j]);
+			result[j] += prev;
+		}
+	}
+	return result;
 }
 
 

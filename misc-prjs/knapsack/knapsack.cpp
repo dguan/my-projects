@@ -3,8 +3,10 @@
 #include <limits>
 #include <algorithm>
 #include <numeric>
+#include <utility>
 #include <exception>
 #include <stdexcept>
+
 using namespace std;
 
 /* ------------------ problem 1: knapsack problem ---------------- */
@@ -258,6 +260,21 @@ int LIS(int data[], int len)
 }
 
 
+// Get the n-th order binomial coefficient using Dynamic Programming
+std::vector<int> binomial_coefficient(int n)
+{
+	std::vector<int> result(n + 1, 1);
+	for (int i = 1; i < n; ++i)
+	{
+		int prev = 1;
+		for (int j = 1; j <= i; ++j)
+		{
+			std::swap(prev, result[j]);
+			result[j] += prev;
+		}
+	}
+	return result;
+}
 
 
 int main(void)
@@ -306,6 +323,13 @@ int main(void)
 	cout << endl << endl;
 
 	cout << "The longest Increasing Sequence's length is: " << LIS(seq, sizeof(seq) / sizeof(seq[0])) << endl;
+	
+	for(int i=0; i<10; i++)
+	{
+		for(int i : binomial_coefficient(i))
+			std::cout << i << "\t";
+		std::cout << std::endl;
+	}
 
 	return 0;
 }

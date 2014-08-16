@@ -162,7 +162,7 @@ http://stackoverflow.com/questions/295579/fastest-way-to-determine-if-an-integer
 
 
 
-
+http://stackoverflow.com/questions/671815/what-is-the-fastest-most-efficient-way-to-find-the-highest-set-bit-msb-in-an-i
 
 
 
