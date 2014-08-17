@@ -10,19 +10,63 @@
 int lexi_sn_idx(int n, int k, int comb[]);
 std::vector<int> nth_comb_idx(int lexi_sn);
 
-template<class BiItor>
-bool next_combination(const BiItor seq_first, const BiItor seq_last, BiItor comb_first, BiItor comb_last)	// seq must be sorted
+
+//////////////////////////////////////////////////////////////////////
+//
+//    Calculate Combination Number
+//
+//////////////////////////////////////////////////////////////////////
+template<int S, int M, int N> struct COMBO_SUM;
+template<int M, int N> struct COMBINATION
+{
+	enum class v : int64_t { val = static_cast<int64_t>(COMBO_SUM<M - N + 1, M, N>::v::val) };
+};
+template<int M> struct COMBINATION<M, 1>
+{
+	enum class v : int64_t { val = M };
+};
+template<int S, int M, int N> struct COMBO_SUM
+{
+	enum class v : int64_t { val = static_cast<int64_t>(COMBINATION<M - S, N - 1>::v::val) + static_cast<int64_t>(COMBO_SUM<S - 1, M, N>::v::val) };
+};
+template<int M, int N> struct COMBO_SUM<0, M, N>
+{
+	enum class v : int64_t { val = 0 };
+};
+
+
+// Get the n-th order binomial coefficient using Dynamic Programming
+// The n+1 numbers correspond to C(n, 0), C(n, 1), ......, C(n, n-1), C(n, n)
+std::vector<int> binomial_coefficient(int n)
+{
+	std::vector<int> result(n + 1, 1);
+	for (int i = 1; i < n; ++i)
+	{
+		int prev = 1;
+		for (int j = 1; j <= i; ++j)
+		{
+			std::swap(prev, result[j]);
+			result[j] += prev;
+		}
+	}
+	return result;
+}
+
+
+// calculate next combination
+template<class BiIter>
+bool next_combination(const BiIter seq_first, const BiIter seq_last, BiIter comb_first, BiIter comb_last)	// seq must be sorted
 {
 	int n = std::distance(seq_first, seq_last);
 	int k = std::distance(comb_first, comb_last);
 	assert(n >= k && k > 0);
 
-	BiItor cur_pos = comb_last;
+	BiIter cur_pos = comb_last;
 	--cur_pos;
 	int chg_cnt = 0;
 	while (true)
 	{
-		BiItor cur_val_itor = std::lower_bound(seq_first, seq_last, *cur_pos);
+		BiIter cur_val_itor = std::lower_bound(seq_first, seq_last, *cur_pos);
 		++cur_val_itor;
 		if (std::distance(cur_val_itor, seq_last) > chg_cnt)
 		{
@@ -45,13 +89,13 @@ bool next_combination(const BiItor seq_first, const BiItor seq_last, BiItor comb
 	}
 }
 
-template<class BiItor>
-bool next_combination_idx(int n, BiItor comb_first, BiItor comb_last)
+template<class BiIter>
+bool next_combination_idx(int n, BiIter comb_first, BiIter comb_last)
 {
 	int k = std::distance(comb_first, comb_last);
 	assert(n >= k && k > 0);
 
-	BiItor cur_pos = comb_last;
+	BiIter cur_pos = comb_last;
 	--cur_pos;
 	int chg_max = n - 1;
 	while (true)
@@ -164,34 +208,20 @@ bool prev_n_1_int(IntType& cur_x, int total_bits = sizeof(IntType)* 8)
 	return true;
 }
 
-// Get the n-th order binomial coefficient using Dynamic Programming
-std::vector<int> binomial_coefficient(int n)
-{
-	std::vector<int> result(n + 1, 1);
-	for (int i = 1; i < n; ++i)
-	{
-		int prev = 1;
-		for (int j = 1; j <= i; ++j)
-		{
-			std::swap(prev, result[j]);
-			result[j] += prev;
-		}
-	}
-	return result;
-}
-
 
 class CombIdx
 {
 public:
 	CombIdx() : n(0), k(0), first(nullptr), last(nullptr), cur_comb(nullptr) {};
 	CombIdx(int _n, int _k) { setup(_n, _k); };
-	CombIdx(int _n, int _k, int *init_comb) { setup(_n, _k, init_comb); };
+	template<class BiIter> CombIdx(int _n, int _k, BiIter init_comb_begin) { setup(_n, _k, init_comb_begin); };
+	template<class BiIter> CombIdx(int _n, BiIter init_comb_begin, BiIter init_comb_end) { setup(_n, init_comb_begin, init_comb_end); };
 	~CombIdx() { delete[] first; delete[] last; delete[] cur_comb; };
 
 	void reset(void);
 	void setup(int _n, int _k);
-	void setup(int _n, int _k, int *init_comb);
+	template<class BiIter> void setup(int _n, int _k, BiIter init_comb_begin);
+	template<class BiIter> void setup(int _n, BiIter init_comb_begin, BiIter init_comb_end);
 	bool next_comb_idx(void);
 	bool prev_comb_idx(void);
 	const std::vector<int> get_first(void) const { return std::vector<int> (first, first+k); };
@@ -242,11 +272,17 @@ void CombIdx::setup(int _n, int _k)
 	std::iota(cur_comb, cur_comb + k, 0);
 }
 
-void CombIdx::setup(int _n, int _k, int *init_comb)
+template<class BiIter> void CombIdx::setup(int _n, int _k, BiIter init_comb_begin)
 {
 	setup(_n, _k);
+	BiIter init_iter = init_comb_begin;
 	for (int i = 0; i < k; ++i)
-		cur_comb[i] = init_comb[i];
+		cur_comb[i] = *init_iter++;
+}
+
+template<class BiIter> void CombIdx::setup(int _n, BiIter init_comb_begin, BiIter init_comb_end)
+{
+	setup(_n, std::distance(init_comb_begin, init_comb_end), init_comb_begin);
 }
 
 /*
@@ -357,22 +393,21 @@ void CombIdx::set_cur_comb(int comb[])
 
 
 
-
 template<class T> 
 class CombSeq
 {
 public:
 	CombSeq() : n(0), k(0), first(nullptr), last(nullptr), cur_comb(nullptr), full_seq(nullptr) {};
-	CombSeq(int _n, int _k, T *full_seq_sorted) { setup(_n, _k, full_seq_sorted); };
-	CombSeq(int _n, int _k, T *full_seq_sorted, T *init_comb) { setup(_n, _k, full_seq_sorted, init_comb); };
-	CombSeq(T *full_seq_begin, T *full_seq_end, int _k) { setup(full_seq_begin, full_seq_end, _k); };
-	CombSeq(T *full_seq_begin, T *full_seq_end, T *init_comb_begin, T *init_comb_end) { setup(full_seq_begin, full_seq_end, init_comb_begin, init_comb_end); };
+	template<class BiIter> CombSeq(int _n, int _k, BiIter full_seq_sorted_begin) { setup(_n, _k, full_seq_sorted_begin); };
+	template<class BiIter1, class BiIter2> CombSeq(int _n, int _k, BiIter1 full_seq_sorted_begin, BiIter2 init_comb_begin) { setup(_n, _k, full_seq_sorted_begin, init_comb_begin); };
+	template<class BiIter> CombSeq(BiIter full_seq_begin, BiIter full_seq_end, int _k) { setup(full_seq_begin, full_seq_end, _k); };
+	template<class BiIter1, class BiIter2> CombSeq(BiIter1 full_seq_begin, BiIter1 full_seq_end, BiIter2 init_comb_begin, BiIter2 init_comb_end) { setup(full_seq_begin, full_seq_end, init_comb_begin, init_comb_end); };
 	~CombSeq() { delete[] first; delete[] last; delete[] cur_comb; delete[] full_seq; }
 	void reset(void);
-	void setup(int _n, int _k, T *full_seq_sorted);
-	void setup(int _n, int _k, T *full_seq_sorted, T *init_comb);
-	void setup(T *full_seq_begin, T *full_seq_end, int _k);
-	void setup(T *full_seq_begin, T *full_seq_end, T *init_comb_begin, T *init_comb_end);
+	template<class BiIter> void setup(int _n, int _k, BiIter full_seq_sorted_begin);
+	template<class BiIter1, class BiIter2> void setup(int _n, int _k, BiIter1 full_seq_sorted_begin, BiIter2 init_comb_begin);
+	template<class BiIter> void setup(BiIter full_seq_begin, BiIter full_seq_end, int _k);
+	template<class BiIter1, class BiIter2> void setup(BiIter1 full_seq_begin, BiIter1 full_seq_end, BiIter2 init_comb_begin, BiIter2 init_comb_end);
 	bool next_comb_seq(void);
 	bool prev_comb_seq(void);
 	const std::vector<T> get_first(void) const { return std::vector<T>(first, first+k); };
@@ -408,7 +443,8 @@ void CombSeq<T>::reset(void)
 }
 
 template<class T>
-void CombSeq<T>::setup(int _n, int _k, T *full_seq_sorted)
+template<class BiIter>
+void CombSeq<T>::setup(int _n, int _k, BiIter full_seq_sorted_begin)
 {
 	n = _n;
 	k = _k;
@@ -416,36 +452,45 @@ void CombSeq<T>::setup(int _n, int _k, T *full_seq_sorted)
 	last = new T[_k];
 	cur_comb = new T[_k];
 	full_seq = new T[_n];
-
+	
+	BiIter fss_iter = full_seq_sorted_begin;
 	for (int i = 0; i<_n; ++i)
-		full_seq[i] = full_seq_sorted[i];
+		full_seq[i] = *fss_iter++;
+		
+	T *forward_ptr = full_seq;
+	T *backward_ptr = full_seq + n - k;
 
 	for (int i = 0; i<_k; ++i)
 	{
-		first[i] = full_seq_sorted[i];
-		last[i] = full_seq_sorted[_n - _k + i];
-		cur_comb[i] = full_seq_sorted[i];
+		first[i] = *forward_ptr;
+		cur_comb[i] = *forward_ptr++;
+		last[i] = *backward_ptr++;
 	}
 }
 
 template<class T>
-void CombSeq<T>::setup(int _n, int _k, T *full_seq_sorted, T *init_comb)
+template<class BiIter1, class BiIter2>
+void CombSeq<T>::setup(int _n, int _k, BiIter1 full_seq_sorted_begin, BiIter2 init_comb_begin)
 {
-	setup(_n, _k, full_seq_sorted);
+	setup(_n, _k, full_seq_sorted_begin);
+	BiIter2 init_iter = init_comb_begin;
 	for (int i = 0; i < k; ++i)
-		cur_comb[i] = init_comb[i];
+		cur_comb[i] = *init_iter++;
 };
 
 template<class T>
-void CombSeq<T>::setup(T *full_seq_begin, T *full_seq_end, int _k)
+template<class BiIter>
+void CombSeq<T>::setup(BiIter full_seq_begin, BiIter full_seq_end, int _k)
 {
-	setup(full_seq_end - full_seq_begin, _k, full_seq_begin);
+	setup(std::distance(full_seq_begin, full_seq_end), _k, full_seq_begin);
 
 }
+
 template<class T>
-void CombSeq<T>::setup(T *full_seq_begin, T *full_seq_end, T *init_comb_begin, T *init_comb_end)
+template<class BiIter1, class BiIter2>
+void CombSeq<T>::setup(BiIter1 full_seq_begin, BiIter1 full_seq_end, BiIter2 init_comb_begin, BiIter2 init_comb_end)
 {
-	setup(full_seq_end - full_seq_begin, init_comb_end - init_comb_begin, full_seq_begin, init_comb_begin);
+	setup(std::distance(full_seq_begin, full_seq_end), std::distance(init_comb_begin, init_comb_end), full_seq_begin, init_comb_begin);
 }
 
 template<class T>

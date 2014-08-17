@@ -6,6 +6,19 @@
 #include <algorithm>
 #include <numeric>
 
+
+//
+// Calculate Permutation number
+//
+template <int M, int N> struct PERMUTATION
+{
+	enum class v : int64_t { val = M * static_cast<int64_t>(PERMUTATION<M-1, N-1>::v::val) };
+};
+template<int M> struct PERMUTATION<M, 0>
+{
+	enum class v : int64_t { val = 1 };
+};
+
 // The maximum length of the sequence to be permuted, used in the idx_seq_to_lexi_order and lexi_order_to_idx_seq functions
 #define MAX_PERMUTATION_SEQ_LEN	12
 // factorial table from 0 to 12
@@ -450,17 +463,17 @@ class PermSeq
 {
 public:
 	PermSeq() : n(0), k(0), first(nullptr), last(nullptr), cur_perm(nullptr), lookup_table(nullptr), full_seq(nullptr) {};
-	template<class BiIter> PermSeq(int _n, int _k, BiIter full_seq_sorted) { setup(_n, _k, full_seq_sorted); };
-	template<class BiIter> PermSeq(int _n, int _k, BiIter full_seq_sorted, BiIter init_perm) { setup(_n, _k, full_seq_sorted, init_perm); };
+	template<class BiIter> PermSeq(int _n, int _k, BiIter full_seq_sorted_begin) { setup(_n, _k, full_seq_sorted_begin); };
+	template<class BiIter1, class BiIter2> PermSeq(int _n, int _k, BiIter1 full_seq_sorted_begin, BiIter2 init_perm_begin) { setup(_n, _k, full_seq_sorted_begin, init_perm_begin); };
 	template<class BiIter> PermSeq(BiIter full_seq_begin, BiIter full_seq_end, int _k) { setup(full_seq_begin, full_seq_end, _k); };
-	template<class BiIter> PermSeq(BiIter full_seq_begin, BiIter full_seq_end, BiIter init_perm_begin, BiIter init_perm_end) { setup(full_seq_begin, full_seq_end, init_perm_begin, init_perm_end); };
+	template<class BiIter1, class BiIter2> PermSeq(BiIter1 full_seq_begin, BiIter1 full_seq_end, BiIter2 init_perm_begin, BiIter2 init_perm_end) { setup(full_seq_begin, full_seq_end, init_perm_begin, init_perm_end); };
 	~PermSeq() { reset(); };
 
 	void reset(void);
 	template<class BiIter> void setup(int _n, int _k, BiIter full_seq_sorted);
-	template<class BiIter> void setup(int _n, int _k, BiIter full_seq_sorted, BiIter init_perm);
+	template<class BiIter1, class BiIter2> void setup(int _n, int _k, BiIter1 full_seq_sorted, BiIter2 init_perm);
 	template<class BiIter> void setup(BiIter full_seq_begin, BiIter full_seq_end, int _k);
-	template<class BiIter> void setup(BiIter full_seq_begin, BiIter full_seq_end, BiIter init_perm_begin, BiIter init_perm_end);
+	template<class BiIter1, class BiIter2> void setup(BiIter1 full_seq_begin, BiIter1 full_seq_end, BiIter2 init_perm_begin, BiIter2 init_perm_end);
 	bool next_perm_seq(void);
 	bool prev_perm_seq(void);
 	const std::vector<T> get_first(void) const { return std::vector<T>(first, first+k); };
@@ -500,7 +513,7 @@ void PermSeq<T>::reset(void)
 
 template<class T>
 template<class BiIter>
-void PermSeq<T>::setup(int _n, int _k, BiIter full_seq_sorted)
+void PermSeq<T>::setup(int _n, int _k, BiIter full_seq_sorted_begin)
 {
 	n = _n;
 	k = _k;
@@ -510,7 +523,7 @@ void PermSeq<T>::setup(int _n, int _k, BiIter full_seq_sorted)
 	lookup_table = new int[_n];
 	std::fill_n(lookup_table, n, 0);
 	full_seq = new T[_n];
-	BiIter forward_iter = full_seq_sorted;
+	BiIter forward_iter = full_seq_sorted_begin;
 	for (int i = 0; i < _n; ++i)
 		full_seq[i] = *forward_iter++;
 	T *forward_ptr = full_seq;
@@ -525,17 +538,16 @@ void PermSeq<T>::setup(int _n, int _k, BiIter full_seq_sorted)
 }
 
 template<class T>
-template<class BiIter>
-void PermSeq<T>::setup(int _n, int _k, BiIter full_seq_sorted_begin, BiIter init_perm_begin)
+template<class BiIter1, class BiIter2>
+void PermSeq<T>::setup(int _n, int _k, BiIter1 full_seq_sorted_begin, BiIter2 init_perm_begin)
 {
-	setup(_n, _k, full_seq_sorted);
-	BiIter forward_iter = init_perm_begin;
+	setup(_n, _k, full_seq_sorted_begin);
+	BiIter2 init_iter = init_perm_begin;
 	for (int i = 0; i < k; ++i)
 	{
-		cur_perm[i] = *forward_iter++;
+		cur_perm[i] = *init_iter++;
 		auto itr = std::lower_bound(full_seq, full_seq + _n, cur_perm[i]);
 		++lookup_table[std::distance(full_seq, itr)];
-
 	}
 }
 
@@ -543,14 +555,14 @@ template<class T>
 template<class BiIter>
 void PermSeq<T>::setup(BiIter full_seq_begin, BiIter full_seq_end, int _k)
 {
-	setup(full_seq_end - full_seq_begin, _k, full_seq_begin);
+	setup(std::distance(full_seq_begin, full_seq_end), _k, full_seq_begin);
 }
 
 template<class T>
-template<class BiIter>
-void PermSeq<T>::setup(BiIter full_seq_begin, BiIter full_seq_end, BiIter init_perm_begin, BiIter init_perm_end)
+template<class BiIter1, class BiIter2>
+void PermSeq<T>::setup(BiIter1 full_seq_begin, BiIter1 full_seq_end, BiIter2 init_perm_begin, BiIter2 init_perm_end)
 {
-	setup(full_seq_end - full_seq_begin, init_perm_end - init_perm_begin, full_seq_begin, init_perm_begin);
+	setup(std::distance(full_seq_begin, full_seq_end), std::distance(init_perm_begin, init_perm_end), full_seq_begin, init_perm_begin);
 }
 
 template<class T>
@@ -636,17 +648,17 @@ template<class T> class PermSeqBit
 {
 public:
 	PermSeqBit() : n(0), k(0), lookup_table(0), first(nullptr), last(nullptr), cur_perm(nullptr), full_seq(nullptr) {};
-	template<class BiIter> PermSeqBit(int _n, int _k, BiIter full_seq_sorted) : lookup_table(0) { setup(_n, _k, full_seq_sorted); };
-	template<class BiIter> PermSeqBit(int _n, int _k, BiIter full_seq_sorted, BiIter init_perm) : lookup_table(0) { setup(_n, _k, full_seq_sorted, init_perm); };
+	template<class BiIter> PermSeqBit(int _n, int _k, BiIter full_seq_sorted_begin) : lookup_table(0) { setup(_n, _k, full_seq_sorted_begin); };
+	template<class BiIter1, class BiIter2> PermSeqBit(int _n, int _k, BiIter1 full_seq_sorted_begin, BiIter2 init_perm_begin) : lookup_table(0) { setup(_n, _k, full_seq_sorted_begin, init_perm_begin); };
 	template<class BiIter> PermSeqBit(BiIter full_seq_begin, BiIter full_seq_end, int _k) : lookup_table(0) { setup(full_seq_begin, full_seq_end, _k); };
-	template<class BiIter> PermSeqBit(BiIter full_seq_begin, BiIter full_seq_end, BiIter init_perm_begin, BiIter init_perm_end) : lookup_table(0) { setup(full_seq_begin, full_seq_end, init_perm_begin, init_perm_end); };
+	template<class BiIter1, class BiIter2> PermSeqBit(BiIter1 full_seq_begin, BiIter1 full_seq_end, BiIter2 init_perm_begin, BiIter2 init_perm_end) : lookup_table(0) { setup(full_seq_begin, full_seq_end, init_perm_begin, init_perm_end); };
 	~PermSeqBit() { reset(); };
 
 	void reset(void);
 	template<class BiIter> void setup(int _n, int _k, BiIter full_seq_sorted);
-	template<class BiIter> void setup(int _n, int _k, BiIter full_seq_sorted, BiIter init_perm);
+	template<class BiIter1, class BiIter2> void setup(int _n, int _k, BiIter1 full_seq_sorted_begin, BiIter2 init_perm_begin);
 	template<class BiIter> void setup(BiIter full_seq_begin, BiIter full_seq_end, int _k);
-	template<class BiIter> void setup(BiIter full_seq_begin, BiIter full_seq_end, BiIter init_perm_begin, BiIter init_perm_end);
+	template<class BiIter1, class BiIter2> void setup(BiIter1 full_seq_begin, BiIter1 full_seq_end, BiIter2 init_perm_begin, BiIter2 init_perm_end);
 	bool next_perm_seq(void);
 	bool prev_perm_seq(void);
 	const std::vector<T> get_first(void) const { return std::vector<T>(first, first + k); };
@@ -685,7 +697,7 @@ void PermSeqBit<T>::reset(void)
 
 template<class T>
 template<class BiIter>
-void PermSeqBit<T>::setup(int _n, int _k, BiIter full_seq_sorted)
+void PermSeqBit<T>::setup(int _n, int _k, BiIter full_seq_sorted_begin)
 {
 	n = _n;
 	k = _k;
@@ -694,7 +706,7 @@ void PermSeqBit<T>::setup(int _n, int _k, BiIter full_seq_sorted)
 	cur_perm = new T[_k];
 
 	full_seq = new T[_n];
-	BiIter forward_iter = full_seq_sorted;
+	BiIter forward_iter = full_seq_sorted_begin;
 	for (int i = 0; i < _n; ++i)
 		full_seq[i] = *forward_iter++;
 
@@ -710,14 +722,14 @@ void PermSeqBit<T>::setup(int _n, int _k, BiIter full_seq_sorted)
 }
 
 template<class T>
-template<class BiIter>
-void PermSeqBit<T>::setup(int _n, int _k, BiIter full_seq_sorted_begin, BiIter init_perm_begin)
+template<class BiIter1, class BiIter2>
+void PermSeqBit<T>::setup(int _n, int _k, BiIter1 full_seq_sorted_begin, BiIter2 init_perm_begin)
 {
 	setup(_n, _k, full_seq_sorted_begin);
-	BiIter forward_iter = init_perm_begin
+	BiIter2 init_iter = init_perm_begin
 	for (int i = 0; i < k; ++i)
 	{
-		cur_perm[i] = *forward_iter++;
+		cur_perm[i] = *init_iter++;
 		auto itr = std::lower_bound(full_seq, full_seq + _n, cur_perm[i]);
 		lookup_table |= 1 << std::distance(full_seq, itr);
 
@@ -732,8 +744,8 @@ void PermSeqBit<T>::setup(BiIter full_seq_begin, BiIter full_seq_end, int _k)
 }
 
 template<class T>
-template<class BiIter>
-void PermSeqBit<T>::setup(BiIter full_seq_begin, BiIter full_seq_end, BiIter init_perm_begin, BiIter init_perm_end)
+template<class BiIter1, class BiIter2>
+void PermSeqBit<T>::setup(BiIter1 full_seq_begin, BiIter1 full_seq_end, BiIter2 init_perm_begin, BiIter2 init_perm_end)
 {
 	setup(std::distance(full_seq_begin, full_seq_end), std::distance(init_perm_begin, init_perm_end), full_seq_begin, init_perm_begin);
 }
