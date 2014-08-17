@@ -74,16 +74,16 @@ std::vector<int> lexi_order_to_idx_seq(unsigned long lexi_order, int N)
 // The explain of the code can be found here:
 // http://stackoverflow.com/questions/11483060/stdnext-permutation-implementation-explanation
 //
-template<class BidirIt>
-bool next_perm(BidirIt first, BidirIt last)
+template<class BiIter>
+bool next_perm(BiIter first, BiIter last)
 {
 	if (first == last) return false;
-	BidirIt i = last;
+	BiIter i = last;
 	if (first == --i) return false;
 
 	while (1)
 	{
-		BidirIt i1, i2;
+		BiIter i1, i2;
 
 		i1 = i;
 		if (*--i < *i1)	// Find the position of the first neighboring position [...i, i1...] is in ascending order
@@ -109,12 +109,14 @@ class PermIdx
 public:
 	PermIdx() : n(0), k(0), first(nullptr), last(nullptr), cur_perm(nullptr), lookup_table(nullptr) {};
 	PermIdx(int _n, int _k) { setup(_n, _k); };
-	PermIdx(int _n, int _k, int *init_perm) { setup(_n, _k, init_perm); };
+	template<class BiIter> PermIdx(int _n, int _k, BiIter init_perm_begin) { setup(_n, _k, init_perm_begin); };
+	template<class BiIter> PermIdx(int _n, BiIter init_perm_begin, BiIter init_perm_end) { setup(_n, init_perm_begin, init_perm_end); };
 	~PermIdx() { reset(); };
 	
 	void reset(void);
 	void setup(int _n, int _k);
-	void setup(int _n, int _k, int *init_perm);
+	template<class BiIter> void setup(int _n, int _k, BiIter init_perm_begin);
+	template<class BiIter> void setup(int _n, BiIter init_perm_begin, BiIter init_perm_end);
 	bool next_perm_idx(void);
 	bool prev_perm_idx(void);
 	const std::vector<int> get_first(void) const { return std::vector<int>(first, first + k); };
@@ -177,15 +179,22 @@ void PermIdx::setup(int _n, int _k)
 	}
 }
 
-void PermIdx::setup(int _n, int _k, int *init_perm)
+template<class BiIter> void PermIdx::setup(int _n, int _k, BiIter init_perm_begin)
 {
 	setup(_n, _k);
+	BiIter forward_iter = init_perm_begin;
 	for (int i = 0; i < k; ++i)
 	{
-		cur_perm[i] = init_perm[i];
-		lookup_table[init_perm[i]]++;
+		cur_perm[i] = *forward_iter++;
+		++lookup_table[cur_perm[i]];
 	}
 }
+
+template<class BiIter> void PermIdx::setup(int _n, BiIter init_perm_begin, BiIter init_perm_end)
+{
+	setup(_n, std::distance(init_perm_begin, init_perm_end), init_perm_begin);
+}
+
 
 bool PermIdx::next_perm_idx(void)
 {
@@ -259,22 +268,199 @@ bool PermIdx::prev_perm_idx(void)
 	}
 }
 
+// Almost the same as PermIdx, only that it uses bit operation for table lookup.
+// It uses an unsigned integer(32 bit) as lookup table, so, it can permuted
+// from at most 32 indexes. The advantage is it only uses an integer instead of
+// an integer array. The performance is also almost the same with PermIdx 
+class PermIdxBit
+{
+public:
+	PermIdxBit() : n(0), k(0), lookup_table(0), first(nullptr), last(nullptr), cur_perm(nullptr) {};
+	PermIdxBit(int _n, int _k) : lookup_table(0) { setup(_n, _k); };
+	template<class BiIter> PermIdxBit(int _n, int _k, BiIter init_perm_begin) : lookup_table(0) { setup(_n, _k, init_perm_begin); };
+	template<class BiIter> PermIdxBit(int _n, BiIter init_perm_begin, BiIter init_perm_end) : lookup_table(0) { setup(_n, init_perm_begin, init_perm_end); };
+	~PermIdxBit() { reset(); };
+
+	void reset(void);
+	void setup(int _n, int _k);
+	template<class BiIter> void setup(int _n, int _k, BiIter init_perm_begin);
+	template<class BiIter> void setup(int _n, BiIter init_perm_begin, BiIter init_perm_end);
+	bool next_perm_idx(void);
+	bool prev_perm_idx(void);
+	const std::vector<int> get_first(void) const { return std::vector<int>(first, first + k); };
+	const std::vector<int> get_last(void) const { return std::vector<int>(last, last + k); };
+	const std::vector<int> get_cur_perm(void) const { return std::vector<int>(cur_perm, cur_perm + k); };
+	void set_cur_perm(int perm[]);
+
+private:
+	int n;
+	int k;
+	int *first;
+	int *last;
+	int *cur_perm;
+	unsigned int lookup_table;
+};
+
+void PermIdxBit::reset(void)
+{
+	if (n != 0)
+	{
+		n = 0;
+		k = 0;
+		delete[] first;
+		first = nullptr;
+		delete[] last;
+		last = nullptr;
+		delete[] cur_perm;
+		cur_perm = nullptr;
+		lookup_table = 0;
+	}
+}
+
+void PermIdxBit::setup(int _n, int _k)
+{
+	n = _n;
+	k = _k;
+	first = new int[_k];
+	last = new int[_k];
+	cur_perm = new int[_k];
+
+	std::iota(first, first + k, 0);
+	std::iota(cur_perm, cur_perm + k, 0);
+	lookup_table |= (1 << k) - 1;
+	for (int i = 0; i<_k; ++i)
+		last[i] = _n - 1 - i;
+}
+
+template<class BiIter> void PermIdxBit::setup(int _n, int _k, BiIter init_perm_begin)
+{
+	setup(_n, _k);
+	BiIter forward_iter = init_perm_begin;
+	for (int i = 0; i < k; ++i)
+	{
+		cur_perm[i] = *forward_iter++;
+		lookup_table |= 1<<cur_perm[i];
+	}
+}
+
+template<class BiIter> void PermIdxBit::setup(int _n, BiIter init_perm_begin, BiIter init_perm_end)
+{
+	setup(_n, std::distance(init_perm_begin, init_perm_end), init_perm_begin);
+}
+
+bool PermIdxBit::next_perm_idx(void)
+{
+	int cur_pos = k - 1;
+	while (true)
+	{
+		int cur_idx = cur_perm[cur_pos];
+		unsigned int cur_bit_mask = 1 << cur_idx;
+		lookup_table ^= cur_bit_mask;
+		++cur_idx;
+		cur_bit_mask <<= 1;
+
+		while (cur_idx < n && (lookup_table & cur_bit_mask))
+		{
+			++cur_idx;
+			cur_bit_mask <<= 1;
+		}
+		if (cur_idx < n)
+		{
+			cur_perm[cur_pos++] = cur_idx;
+			lookup_table |= cur_bit_mask;
+			int lookup_table_idx = 0;
+			cur_bit_mask = 1;
+			while (cur_pos < k)
+			{
+				while (lookup_table & cur_bit_mask)
+				{
+					++lookup_table_idx;
+					cur_bit_mask <<= 1;
+				}
+				cur_perm[cur_pos++] = lookup_table_idx;
+				lookup_table |= cur_bit_mask;
+				++lookup_table_idx;
+				cur_bit_mask <<= 1;
+			}
+			return true;
+		}
+		else
+		{
+			--cur_pos;
+			if (cur_pos < 0)
+			{
+				lookup_table = ((1<<k)-1) << (n - k);
+				return false;
+			}
+		}
+	}
+}
+
+bool PermIdxBit::prev_perm_idx(void)
+{
+	int cur_pos = k - 1;
+	while (true)
+	{
+		int cur_idx = cur_perm[cur_pos];
+		unsigned int cur_bit_mask = 1 << cur_idx;
+		lookup_table ^= cur_bit_mask;
+		--cur_idx;
+		cur_bit_mask >>= 1;
+
+		while (cur_idx >= 0 && (lookup_table & cur_bit_mask))
+		{
+			--cur_idx;
+			cur_bit_mask >>= 1;
+		}
+		if (cur_idx >= 0)
+		{
+			cur_perm[cur_pos++] = cur_idx;
+			lookup_table |= cur_bit_mask;
+			int lookup_table_idx = n - 1;
+			cur_bit_mask = 1 << lookup_table_idx;
+			while (cur_pos < k)
+			{
+				while (lookup_table & cur_bit_mask)
+				{
+					--lookup_table_idx;
+					cur_bit_mask >>= 1;
+				}
+				cur_perm[cur_pos++] = lookup_table_idx;
+				lookup_table |= cur_bit_mask;
+				--lookup_table_idx;
+				cur_bit_mask >>= 1;
+			}
+			return true;
+		}
+		else
+		{
+			--cur_pos;
+			if (cur_pos < 0)
+			{
+				lookup_table = (1 << k) - 1;
+				return false;
+			}
+		}
+	}
+}
+
+
 template<class T>
 class PermSeq
 {
 public:
 	PermSeq() : n(0), k(0), first(nullptr), last(nullptr), cur_perm(nullptr), lookup_table(nullptr), full_seq(nullptr) {};
-	PermSeq(int _n, int _k, T *full_seq_sorted) { setup(_n, _k, full_seq_sorted); };
-	PermSeq(int _n, int _k, T *full_seq_sorted, T *init_perm) { setup(_n, _k, full_seq_sorted, init_perm); };
-	PermSeq(T *full_seq_begin, T *full_seq_end, int _k) { setup(full_seq_begin, full_seq_end, _k); };
-	PermSeq(T *full_seq_begin, T *full_seq_end, T *init_perm_begin, T *init_perm_end) { setup(full_seq_begin, full_seq_end, init_perm_begin, init_perm_end); };
+	template<class BiIter> PermSeq(int _n, int _k, BiIter full_seq_sorted) { setup(_n, _k, full_seq_sorted); };
+	template<class BiIter> PermSeq(int _n, int _k, BiIter full_seq_sorted, BiIter init_perm) { setup(_n, _k, full_seq_sorted, init_perm); };
+	template<class BiIter> PermSeq(BiIter full_seq_begin, BiIter full_seq_end, int _k) { setup(full_seq_begin, full_seq_end, _k); };
+	template<class BiIter> PermSeq(BiIter full_seq_begin, BiIter full_seq_end, BiIter init_perm_begin, BiIter init_perm_end) { setup(full_seq_begin, full_seq_end, init_perm_begin, init_perm_end); };
 	~PermSeq() { reset(); };
 
 	void reset(void);
-	void setup(int _n, int _k, T *full_seq_sorted);
-	void setup(int _n, int _k, T *full_seq_sorted, T *init_perm);
-	void setup(T *full_seq_begin, T *full_seq_end, int _k);
-	void setup(T *full_seq_begin, T *full_seq_end, T *init_perm_begin, T *init_perm_end);
+	template<class BiIter> void setup(int _n, int _k, BiIter full_seq_sorted);
+	template<class BiIter> void setup(int _n, int _k, BiIter full_seq_sorted, BiIter init_perm);
+	template<class BiIter> void setup(BiIter full_seq_begin, BiIter full_seq_end, int _k);
+	template<class BiIter> void setup(BiIter full_seq_begin, BiIter full_seq_end, BiIter init_perm_begin, BiIter init_perm_end);
 	bool next_perm_seq(void);
 	bool prev_perm_seq(void);
 	const std::vector<T> get_first(void) const { return std::vector<T>(first, first+k); };
@@ -313,7 +499,8 @@ void PermSeq<T>::reset(void)
 }
 
 template<class T>
-void PermSeq<T>::setup(int _n, int _k, T *full_seq_sorted)
+template<class BiIter>
+void PermSeq<T>::setup(int _n, int _k, BiIter full_seq_sorted)
 {
 	n = _n;
 	k = _k;
@@ -323,41 +510,45 @@ void PermSeq<T>::setup(int _n, int _k, T *full_seq_sorted)
 	lookup_table = new int[_n];
 	std::fill_n(lookup_table, n, 0);
 	full_seq = new T[_n];
+	BiIter forward_iter = full_seq_sorted;
 	for (int i = 0; i < _n; ++i)
-	{
-		full_seq[i] = full_seq_sorted[i];
-		//lookup_table[i] = 0;
-	}
+		full_seq[i] = *forward_iter++;
+	T *forward_ptr = full_seq;
+	T *backward_ptr = full_seq + n -1;
 	for (int i = 0; i<_k; ++i)
 	{
-		first[i] = full_seq_sorted[i];
-		last[i] = full_seq_sorted[_n - 1 - i];
-		cur_perm[i] = full_seq_sorted[i];
+		first[i] = *forward_ptr;
+		cur_perm[i] = *forward_ptr++;
+		last[i] = *backward_ptr--;
 		lookup_table[i]++;
 	}
 }
 
 template<class T>
-void PermSeq<T>::setup(int _n, int _k, T *full_seq_sorted, T *init_perm)
+template<class BiIter>
+void PermSeq<T>::setup(int _n, int _k, BiIter full_seq_sorted_begin, BiIter init_perm_begin)
 {
 	setup(_n, _k, full_seq_sorted);
+	BiIter forward_iter = init_perm_begin;
 	for (int i = 0; i < k; ++i)
 	{
-		cur_perm[i] = init_perm[i];
-		auto itr = std::lower_bound(full_seq_sorted, full_seq_sorted+_n, init_perm[i]);
-		++lookup_table[std::distance(full_seq_sorted, itr)];
+		cur_perm[i] = *forward_iter++;
+		auto itr = std::lower_bound(full_seq, full_seq + _n, cur_perm[i]);
+		++lookup_table[std::distance(full_seq, itr)];
 
 	}
 }
 
 template<class T>
-void PermSeq<T>::setup(T *full_seq_begin, T *full_seq_end, int _k)
+template<class BiIter>
+void PermSeq<T>::setup(BiIter full_seq_begin, BiIter full_seq_end, int _k)
 {
 	setup(full_seq_end - full_seq_begin, _k, full_seq_begin);
 }
 
 template<class T>
-void PermSeq<T>::setup(T *full_seq_begin, T *full_seq_end, T *init_perm_begin, T *init_perm_end)
+template<class BiIter>
+void PermSeq<T>::setup(BiIter full_seq_begin, BiIter full_seq_end, BiIter init_perm_begin, BiIter init_perm_end)
 {
 	setup(full_seq_end - full_seq_begin, init_perm_end - init_perm_begin, full_seq_begin, init_perm_begin);
 }
@@ -430,6 +621,211 @@ bool PermSeq<T>::prev_perm_seq(void)
 			{
 				for (int i = 0; i < k; ++i)
 					++lookup_table[i];
+				return false;
+			}
+		}
+	}
+}
+
+
+// Almost the same as PermIdx, only that it uses bit operation for table lookup.
+// It uses an unsigned integer(32 bit) as lookup table, so, it can permuted
+// from at most 32 indexes. The advantage is it only uses an integer instead of
+// an integer array. The performance is also almost the same with PermIdx 
+template<class T> class PermSeqBit
+{
+public:
+	PermSeqBit() : n(0), k(0), lookup_table(0), first(nullptr), last(nullptr), cur_perm(nullptr), full_seq(nullptr) {};
+	template<class BiIter> PermSeqBit(int _n, int _k, BiIter full_seq_sorted) : lookup_table(0) { setup(_n, _k, full_seq_sorted); };
+	template<class BiIter> PermSeqBit(int _n, int _k, BiIter full_seq_sorted, BiIter init_perm) : lookup_table(0) { setup(_n, _k, full_seq_sorted, init_perm); };
+	template<class BiIter> PermSeqBit(BiIter full_seq_begin, BiIter full_seq_end, int _k) : lookup_table(0) { setup(full_seq_begin, full_seq_end, _k); };
+	template<class BiIter> PermSeqBit(BiIter full_seq_begin, BiIter full_seq_end, BiIter init_perm_begin, BiIter init_perm_end) : lookup_table(0) { setup(full_seq_begin, full_seq_end, init_perm_begin, init_perm_end); };
+	~PermSeqBit() { reset(); };
+
+	void reset(void);
+	template<class BiIter> void setup(int _n, int _k, BiIter full_seq_sorted);
+	template<class BiIter> void setup(int _n, int _k, BiIter full_seq_sorted, BiIter init_perm);
+	template<class BiIter> void setup(BiIter full_seq_begin, BiIter full_seq_end, int _k);
+	template<class BiIter> void setup(BiIter full_seq_begin, BiIter full_seq_end, BiIter init_perm_begin, BiIter init_perm_end);
+	bool next_perm_seq(void);
+	bool prev_perm_seq(void);
+	const std::vector<T> get_first(void) const { return std::vector<T>(first, first + k); };
+	const std::vector<T> get_last(void) const { return std::vector<T>(last, last + k); };
+	const std::vector<T> get_cur_perm(void) const { return std::vector<T>(cur_perm, cur_perm + k); };
+	void set_cur_perm(T perm[]);
+
+private:
+	int n;
+	int k;
+	T *first;
+	T *last;
+	T *cur_perm;
+	T *full_seq;
+	unsigned int lookup_table;
+};
+
+template<class T>
+void PermSeqBit<T>::reset(void)
+{
+	if (n != 0)
+	{
+		n = 0;
+		k = 0;
+		delete[] first;
+		first = nullptr;
+		delete[] last;
+		last = nullptr;
+		delete[] cur_perm;
+		cur_perm = nullptr;
+		delete[] full_seq;
+		full_seq = nullptr;
+		lookup_table = 0;
+	}
+}
+
+template<class T>
+template<class BiIter>
+void PermSeqBit<T>::setup(int _n, int _k, BiIter full_seq_sorted)
+{
+	n = _n;
+	k = _k;
+	first = new T[_k];
+	last = new T[_k];
+	cur_perm = new T[_k];
+
+	full_seq = new T[_n];
+	BiIter forward_iter = full_seq_sorted;
+	for (int i = 0; i < _n; ++i)
+		full_seq[i] = *forward_iter++;
+
+	T *forward_ptr = full_seq;
+	T *backward_ptr = full_seq + _n - 1);
+	for (int i = 0; i<_k; ++i)
+	{
+		first[i] = *forward_ptr;
+		cur_perm[i] = *forward_ptr++;
+		last[i] = *backward_ptr--;
+	}
+	lookup_table |= (1 << k) - 1;
+}
+
+template<class T>
+template<class BiIter>
+void PermSeqBit<T>::setup(int _n, int _k, BiIter full_seq_sorted_begin, BiIter init_perm_begin)
+{
+	setup(_n, _k, full_seq_sorted_begin);
+	BiIter forward_iter = init_perm_begin
+	for (int i = 0; i < k; ++i)
+	{
+		cur_perm[i] = *forward_iter++;
+		auto itr = std::lower_bound(full_seq, full_seq + _n, cur_perm[i]);
+		lookup_table |= 1 << std::distance(full_seq, itr);
+
+	}
+}
+
+template<class T>
+template<class BiIter>
+void PermSeqBit<T>::setup(BiIter full_seq_begin, BiIter full_seq_end, int _k)
+{
+	setup(std::distance(full_seq_begin, full_seq_end), _k, full_seq_begin);
+}
+
+template<class T>
+template<class BiIter>
+void PermSeqBit<T>::setup(BiIter full_seq_begin, BiIter full_seq_end, BiIter init_perm_begin, BiIter init_perm_end)
+{
+	setup(std::distance(full_seq_begin, full_seq_end), std::distance(init_perm_begin, init_perm_end), full_seq_begin, init_perm_begin);
+}
+
+template<class T>
+bool PermSeqBit<T>::next_perm_seq(void)
+{
+	int cur_pos = k - 1;
+	while (true)
+	{
+		int table_idx = std::distance(full_seq, std::upper_bound(full_seq, full_seq + n, cur_perm[cur_pos]));
+		unsigned int cur_bit_mask = 1 << table_idx;
+		lookup_table ^= (cur_bit_mask >> 1);
+		while (table_idx < n && (lookup_table & cur_bit_mask))
+		{
+			++table_idx;
+			cur_bit_mask <<= 1;
+		}
+		if (table_idx < n)
+		{
+			cur_perm[cur_pos++] = full_seq[table_idx];
+			lookup_table |= cur_bit_mask;
+			table_idx = 0;
+			cur_bit_mask = 1;
+			while (cur_pos < k)
+			{
+				while (lookup_table & cur_bit_mask)
+				{
+					++table_idx;
+					cur_bit_mask <<= 1;
+				}
+				cur_perm[cur_pos++] = full_seq[table_idx];
+				lookup_table |= cur_bit_mask;
+				++table_idx;
+				cur_bit_mask <<= 1;
+			}
+			return true;
+		}
+		else
+		{
+			--cur_pos;
+			if (cur_pos < 0)
+			{
+				lookup_table = ((1 << k) - 1) << (n - k);
+				return false;
+			}
+		}
+	}
+}
+
+template<class T>
+bool PermSeqBit<T>::prev_perm_seq(void)
+{
+	int cur_pos = k - 1;
+	while (true)
+	{
+		int table_idx = std::distance(full_seq, std::lower_bound(full_seq, full_seq + n, cur_perm[cur_pos]));
+		unsigned int cur_bit_mask = 1 << table_idx;
+		lookup_table ^= cur_bit_mask;
+		--table_idx;
+		cur_bit_mask >>= 1;
+		while (table_idx >= 0 && (lookup_table & cur_bit_mask))
+		{
+			--table_idx;
+			cur_bit_mask >>= 1;
+		}
+		if (table_idx >= 0)
+		{
+			cur_perm[cur_pos++] = full_seq[table_idx];
+			lookup_table |= cur_bit_mask;
+			table_idx = n - 1;
+			cur_bit_mask = 1 << table_idx;
+			while (cur_pos < k)
+			{
+				while (lookup_table & cur_bit_mask)
+				{
+					--table_idx;
+					cur_bit_mask >>= 1;
+				}
+				cur_perm[cur_pos++] = full_seq[table_idx];
+				lookup_table |= cur_bit_mask;
+				--table_idx;
+				cur_bit_mask >>= 1;
+			}
+			return true;
+		}
+		else
+		{
+			--cur_pos;
+			if (cur_pos < 0)
+			{
+				lookup_table = (1 << k) - 1;
 				return false;
 			}
 		}
