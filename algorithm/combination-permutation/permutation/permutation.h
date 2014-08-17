@@ -4,9 +4,105 @@
 #include <vector>
 #include <memory>
 #include <algorithm>
+#include <numeric>
 
-int lexi_sn_idx(int n, int k, int perm[]);
-std::vector<int> nth_perm_idx(int n, int k, int lexi_sn);
+// The maximum length of the sequence to be permuted, used in the idx_seq_to_lexi_order and lexi_order_to_idx_seq functions
+#define MAX_PERMUTATION_SEQ_LEN	12
+// factorial table from 0 to 12
+static const unsigned long fac_table[] = { 1, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880, 3628800, 39916800, 479001600 };
+
+// Calculate the lexicographic permutation index from permutation's index sequence
+unsigned long idx_seq_to_lexi_order(int idx_seq[], int N)
+{
+	if (N <= 1)
+		return 0UL;
+	int coeffs[MAX_PERMUTATION_SEQ_LEN];
+	int *seq_ptr = idx_seq;
+	int *coeff_ptr = coeffs + N - 2;
+
+	while(seq_ptr != idx_seq + N - 1)
+	{
+		int order = *seq_ptr;
+		order -= std::count_if(idx_seq, seq_ptr, [order](int x) { return x < order; });
+		*coeff_ptr-- = order;
+		++seq_ptr;
+	}
+	unsigned long sn = coeffs[0];
+	coeff_ptr = coeffs;
+	++coeff_ptr;
+	for (int i = 2; i <= N - 1; ++i)
+	{
+		if (*coeff_ptr)
+			sn += *coeff_ptr * fac_table[i];
+		++coeff_ptr;
+	}
+	return sn;
+}
+
+// Calculate the lexicographic permutation index from permutation's index sequence
+std::vector<int> lexi_order_to_idx_seq(unsigned long lexi_order, int N)
+{
+	std::vector<int> idx_seq;
+	auto fac_iter = std::upper_bound(fac_table, fac_table + N + 1, lexi_order);
+	int n = std::distance(fac_table, fac_iter);
+	for (int i = 0; i < N - n; ++i)
+		idx_seq.push_back(i);
+	--fac_iter;
+	for (int i = 0; i < n; ++i)
+	{
+		int coeff = lexi_order / *fac_iter;
+		lexi_order -= coeff * *fac_iter--;
+		int idx = 0;
+		while(idx < N)
+		{
+			if (std::find(idx_seq.begin(), idx_seq.end(), idx) == idx_seq.end())
+				--coeff;
+			if (coeff < 0)
+				break;
+			++idx;
+		}
+		idx_seq.push_back(idx);
+	}
+	return idx_seq;
+}
+
+//
+// This code used ancient Hindu mathematician Narayana Pandit's permutation algorithm,
+// and its performance is comparable with std::next_permutation, only that it can only
+// P(n, n), cannot do P(n, k)
+//
+// The explain of the code can be found here:
+// http://stackoverflow.com/questions/11483060/stdnext-permutation-implementation-explanation
+//
+template<class BidirIt>
+bool next_perm(BidirIt first, BidirIt last)
+{
+	if (first == last) return false;
+	BidirIt i = last;
+	if (first == --i) return false;
+
+	while (1)
+	{
+		BidirIt i1, i2;
+
+		i1 = i;
+		if (*--i < *i1)	// Find the position of the first neighboring position [...i, i1...] is in ascending order
+		{
+			i2 = last;
+			while (!(*i < *--i2))	// Finding the first number greater than *i,(and is the greatest)in the right to be swapped with *i
+				;
+			std::iter_swap(i, i2);	// Swap *i and *i2
+			std::reverse(i1, last);	// reverse the position after i till end
+			return true;
+		}
+		if (i == first)
+		{
+			std::reverse(first, last);	// I reverse the last permutation to the first permutation only to conform with std::next_permutation, would rather not to reverse it. 
+			return false;
+		}
+	}
+}
+
 
 class PermIdx
 {
@@ -14,6 +110,8 @@ public:
 	PermIdx() : n(0), k(0), first(nullptr), last(nullptr), cur_perm(nullptr), lookup_table(nullptr) {};
 	PermIdx(int _n, int _k) { setup(_n, _k); };
 	PermIdx(int _n, int _k, int *init_perm) { setup(_n, _k, init_perm); };
+	~PermIdx() { reset(); };
+	
 	void reset(void);
 	void setup(int _n, int _k);
 	void setup(int _n, int _k, int *init_perm);
@@ -170,6 +268,7 @@ public:
 	PermSeq(int _n, int _k, T *full_seq_sorted, T *init_perm) { setup(_n, _k, full_seq_sorted, init_perm); };
 	PermSeq(T *full_seq_begin, T *full_seq_end, int _k) { setup(full_seq_begin, full_seq_end, _k); };
 	PermSeq(T *full_seq_begin, T *full_seq_end, T *init_perm_begin, T *init_perm_end) { setup(full_seq_begin, full_seq_end, init_perm_begin, init_perm_end); };
+	~PermSeq() { reset(); };
 
 	void reset(void);
 	void setup(int _n, int _k, T *full_seq_sorted);

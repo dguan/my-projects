@@ -5,43 +5,9 @@
 
 using namespace std::chrono;
 
-//
-// Code from cppreference.com
-// http://en.cppreference.com/w/cpp/algorithm/next_permutation
-// And this is an explaination of the code
-// http://stackoverflow.com/questions/11483060/stdnext-permutation-implementation-explanation
-//
-template<class BidirIt>
-bool next_perm(BidirIt first, BidirIt last)
-{
-	if (first == last) return false;
-	BidirIt i = last;
-	if (first == --i) return false;
-
-	while (1)
-	{
-		BidirIt i1, i2;
-
-		i1 = i;
-		if (*--i < *i1)	// Find the position of the first neighboring position [...i, i1...] is in ascending order
-		{
-			i2 = last;
-			while (!(*i < *--i2))	// Finding the first number greater than *i,(and is the greatest)in the right to be swapped with *i
-				;
-			std::iter_swap(i, i2);	// Swap *i and *i2
-			std::reverse(i1, last);	// reverse the position after i till end
-			return true;
-		}
-		if (i == first)
-		{
-			std::reverse(first, last);
-			return false;
-		}
-	}
-}
-
 // for testing simulated P(n, k)
 #include "../combination/combination.h"
+
 
 int main()
 {
@@ -128,7 +94,7 @@ int main()
 		while(std::next_permutation(cur_comb.begin(), cur_comb.end()));
 	} while(ci.next_comb_idx());
 	auto t7 = high_resolution_clock::now();
-	std::cout << "Time of simulatd P(12, 9) is: " << duration_cast<milliseconds>(t7 - t6).count() << " milliseconds" << std::endl;
+	std::cout << "Time of simulated P(12, 9) is: " << duration_cast<milliseconds>(t7 - t6).count() << " milliseconds" << std::endl;
 
 	return 0;
 }
