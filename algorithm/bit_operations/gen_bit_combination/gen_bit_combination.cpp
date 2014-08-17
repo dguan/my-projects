@@ -162,8 +162,6 @@ int main()
 		++cnt;
 	} while (prev_n_1_int(init_int, 4));
 	std::cout << "Total " << cnt << " integers" << std::endl;
-
-	system("pause");
 	return 0;
 }
 

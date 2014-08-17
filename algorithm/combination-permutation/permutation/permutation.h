@@ -308,10 +308,10 @@ public:
 private:
 	int n;
 	int k;
+	unsigned int lookup_table;
 	int *first;
 	int *last;
 	int *cur_perm;
-	unsigned int lookup_table;
 };
 
 void PermIdxBit::reset(void)
@@ -669,11 +669,11 @@ public:
 private:
 	int n;
 	int k;
+	unsigned int lookup_table;
 	T *first;
 	T *last;
 	T *cur_perm;
 	T *full_seq;
-	unsigned int lookup_table;
 };
 
 template<class T>
@@ -711,7 +711,7 @@ void PermSeqBit<T>::setup(int _n, int _k, BiIter full_seq_sorted_begin)
 		full_seq[i] = *forward_iter++;
 
 	T *forward_ptr = full_seq;
-	T *backward_ptr = full_seq + _n - 1);
+	T *backward_ptr = full_seq + _n - 1;
 	for (int i = 0; i<_k; ++i)
 	{
 		first[i] = *forward_ptr;
@@ -726,7 +726,7 @@ template<class BiIter1, class BiIter2>
 void PermSeqBit<T>::setup(int _n, int _k, BiIter1 full_seq_sorted_begin, BiIter2 init_perm_begin)
 {
 	setup(_n, _k, full_seq_sorted_begin);
-	BiIter2 init_iter = init_perm_begin
+	BiIter2 init_iter = init_perm_begin;
 	for (int i = 0; i < k; ++i)
 	{
 		cur_perm[i] = *init_iter++;

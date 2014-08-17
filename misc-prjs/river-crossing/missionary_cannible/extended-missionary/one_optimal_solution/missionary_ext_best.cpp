@@ -170,7 +170,7 @@ typedef std::unordered_map<unsigned long long, int> UsedStateTable;
 
 const int INTEGER_BITS = sizeof(int)* 8;// Total bits in an integer, maximum elements in an integer should be INTEGER_BITS-1
 static int g_Missionary_N;				// number of missionaries
-static int g_Cannible_N;				// number of cannibals, this may be less than the missionaries
+static int g_Cannibal_N;				// number of cannibals, this may be less than the missionaries
 
 static int g_BestTime = std::numeric_limits<int>::max();
 static std::string g_BestSolution;
@@ -290,7 +290,7 @@ std::vector<state> get_safe_movs(const state& st, int boat_volume, const UsedSta
 		int min_c_time = std::numeric_limits<int>::max();
 
 		std::vector<int> m_bit_index = std::move(bit_index_to_index(m_from, g_Missionary_N, pc[0]));
-		std::vector<int> c_bit_index = std::move(bit_index_to_index(c_from, g_Cannible_N, pc[1]));
+		std::vector<int> c_bit_index = std::move(bit_index_to_index(c_from, g_Cannibal_N, pc[1]));
 
 		if (!m_bit_index.empty())
 			min_m_time = missionaries[m_bit_index[0]];	//because missionaries and m_bit_index are all sorted, so the first is the shortest in time
@@ -352,7 +352,7 @@ void find_solution_dfs(const state& cur_st, int boat_volume, UsedStateTable& use
 					min_m_time = time;
 			}
 		}
-		for (int i = 0; i < g_Cannible_N; ++i)
+		for (int i = 0; i < g_Cannibal_N; ++i)
 		{
 			if (cur_st.cLeft & (1 << i))
 			{
@@ -428,7 +428,7 @@ void find_solution_bfs(std::queue<state>& cur_states, int boat_volume, UsedState
 							min_m_time = time;
 					}
 				}
-				for (int i = 0; i < g_Cannible_N; ++i)
+				for (int i = 0; i < g_Cannibal_N; ++i)
 				{
 					if (gc.cLeft & (1 << i))
 					{
@@ -479,7 +479,7 @@ int main(void)
 	// Some initialization
 	init_bit_cnt_table(BIT_CNT);
 	g_Missionary_N = missionaries.size();
-	g_Cannible_N = cannibals.size();
+	g_Cannibal_N = cannibals.size();
 
 	std::cout << std::endl << "******************** DFS algorithm *********************" << std::endl << std::endl;
 	UsedStateTable used_states;
