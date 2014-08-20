@@ -82,7 +82,7 @@ bool subset_exist(const std::vector<int>& input_data, int target_value)
 // if it is not there then add it, otherwise discard it.
 //
 // Another thing to be pointed out is that, this algorithm is not scalable, the complexity increase
-// in exponential scale. Using set or Hash table can prove this to certain extent, yet it is still complex.
+// in exponential scale. Using set or Hash table can improve this to certain extent, yet it is still complex.
 //
 // Because there's already the StackOverflow solution, I am not going to give the non-recursive solution here, 
 //

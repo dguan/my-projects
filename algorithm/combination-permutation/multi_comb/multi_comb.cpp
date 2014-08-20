@@ -4,7 +4,7 @@
 #include <algorithm>
 
 //
-// This function is to generate all combinations of choosing m from n_items in lexicographic order.
+// This function is to generate all combinations of choosing m from n items in lexicographic order.
 // The return vaule of this function is all index's combinations. This is only a naive none-recursive
 // implementation, and performance is rather bad. Actually, this programm is focusing on multi-combination,
 // so this function is not important here, as long as it can generate combination of indexes. I implemented
@@ -57,8 +57,8 @@ std::vector<std::vector<int>> combination_idx_nr(int n_items, int m)
 	Because the objects in the groups are identical, so no need to select individual objects to construct the combination,
 	only the number of the objects selected from that group is enough.
 	This is useful in solving problems that involves same kind of objects but differ in certain properties, Such as:
-	    1) From the mixture of some red balls and some bule balls, choose N balls.
-		2) The classical missionary-and-cannible problem
+	    1) From groups of red balls and blue balls, choose a mixture of N balls.
+		2) The classical missionary-and-cannibal problem
 		......
 */
 std::vector<std::vector<int>> get_multi_comb_cnt(int item_cnt_grps[], int n_grps, int num_combo)
@@ -84,7 +84,6 @@ std::vector<std::vector<int>> get_multi_comb_cnt(int item_cnt_grps[], int n_grps
 	return results;
 }
 
-
 /*
     get_multi_comb_idx() is to select same kind of objects but with individuality, from multiple groups distinguished
 	by certain properties, and to construct a mixed combination. Because the objects in the groups are not identical,
@@ -92,12 +91,12 @@ std::vector<std::vector<int>> get_multi_comb_cnt(int item_cnt_grps[], int n_grps
 	choose objects one by one.
     This is useful in solving problems that involves individual objects of the same kind, but differ in certain properties,
 	generally, this algorithm often involves with some complex problems, such as:
-        1) The expanded missionary-and-cannible problem, each missionary or cannible took different time to row the boat
+        1) The expanded missionary-and-cannibal problem, each missionary or cannibal took different time to row the boat
 		across the river, so what is the best plan to cross the river in the shortest time?
 		2) The expanded knapsack problem, you have to pack certain kinds of items into the knapsack no matter its size and value,
 		so, how to achieve the optimal value?
 		......
-	To achieve the utmost genericity, and simplicity, I make the algorithm to return indexes from each group. 
+	To achieve the utmost generality, and simplicity, I make the algorithm to return indexes from each group. 
 */
 std::vector<std::vector<std::vector<int>>> get_multi_comb_idx(int *grp_cnts, int num_grps, int combo_cnt)
 {
@@ -148,12 +147,11 @@ std::vector<std::vector<std::vector<int>>> get_multi_comb_idx(int *grp_cnts, int
     Well, I suppose you were shocked by the scaring vector<vector<vector<int>>> declaration of the get_multi_comb_idx(),
     this one is a little bit better, ...... vector<vector<int>>. This one uses one bit of the integer to present
     one index in the group. So, obviously, the group cannot have more items than the bits in the integer, usually
-    32 bits for an unsigned integer, or 64 bits for an int64_t. This should be quite enough for most circumstances.
-	Ideally, this algorithm could have been implemented using bitset, but, STL has only fixed length bitset, although
-	Boost library has a nice dynamic_bitset, I would rather leave not to introduce another library into this code,
-	so, just implement it as is using integers, until future new C++ standard introduce its own dynamic bitset.
+    32 bits for an unsigned integer, or 64 bits for an int64_t or long long, this should be quite enough for
+    most circumstances.	Ideally, this algorithm could have been implemented using bitset, but, STL has only fixed length
+	bitset, although Boost library has a nice dynamic_bitset, I would rather not to introduce another library into this code,
+	so, I just implemented it as is using integer types, until future new C++ standard introduce its own dynamic bitset.
 */
-
 std::vector<std::vector<int>> get_multi_comb_idx_bits(int *grp_cnts, int num_grps, int combo_cnt)
 {
 	std::vector<std::vector<int>> results;
@@ -206,8 +204,6 @@ std::vector<std::vector<int>> get_multi_comb_idx_bits(int *grp_cnts, int num_grp
 	}
 	return results;
 }
-
-
 
 
 

@@ -28,7 +28,7 @@ using namespace std::chrono;
 // order==false for ascending, order==true for descending
 // msd_lsd==false for most-significant-digit sort, msd_lsd==true for least-significant-digit sort
 // For integer sorting, it makes no sense to sort from MSD to LSD, just keep this option here,
-// MSD sort is useflu when sorting strings. 
+// MSD sort is useful when sorting strings. 
 template <class T, bool order=false, bool msd_lsd=false> T *radix_sort(T data[], int count, T *buff)
 {
 	if (count <= 0)

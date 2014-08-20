@@ -16,7 +16,7 @@ struct Node {
 	Node<T> *left;
 	Node<T> *right;
 	Node(T val) : value(val), left(nullptr), right(nullptr)	{ ++node_construction_cnt; };
-	// Actually I do not need this desctructor, only to demonstrate that all nodes destructed correctly
+	// Actually I do not need this destructor, only to demonstrate that all nodes destructed correctly
 	~Node() { ++node_destruction_cnt; };
 };
 
@@ -26,7 +26,7 @@ struct SharedNode {
 	std::shared_ptr<SharedNode<T>> left;
 	std::shared_ptr<SharedNode<T>> right;
 	SharedNode(T val) : value(val), left(nullptr), right(nullptr)	{ ++shared_node_construction_cnt; };
-	// Actually I do not need this desctructor, only to demonstrate that all shared nodes destructed correctly
+	// Actually I do not need this destructor, only to demonstrate that all shared nodes destructed correctly
 	~SharedNode() { ++shared_node_destruction_cnt; };
 };
 

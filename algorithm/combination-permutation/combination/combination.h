@@ -37,12 +37,13 @@ template<int M, int N> struct COMBO_SUM<0, M, N>
 
 // Get the n-th order binomial coefficient using Dynamic Programming
 // The n+1 numbers correspond to C(n, 0), C(n, 1), ......, C(n, n-1), C(n, n)
-std::vector<int> binomial_coefficient(int n)
+template<class RetIntType = unsigned int>
+std::vector<RetIntType> binomial_coefficient(int n)
 {
-	std::vector<int> result(n + 1, 1);
+	std::vector<RetIntType> result(n + 1, 1);
 	for (int i = 1; i < n; ++i)
 	{
-		int prev = 1;
+		RetIntType prev = 1;
 		for (int j = 1; j <= i; ++j)
 		{
 			std::swap(prev, result[j]);

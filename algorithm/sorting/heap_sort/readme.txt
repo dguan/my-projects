@@ -1,6 +1,6 @@
 Implementation of non-recursive heap sort algorithm and performance bentch marking with STL algorithm.
 
-The bentch marking is like this (compiled with gcc, with -O3 optimization):
+The bentch marking is like this (compiled with g++ 8.4, with -O3 optimization):
 
 This implementation      STL make_heap and sort_heap      std::sort
       247 ms                    136 ms                     72 ms

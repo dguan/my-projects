@@ -261,12 +261,13 @@ int LIS(int data[], int len)
 
 
 // Get the n-th order binomial coefficient using Dynamic Programming
-std::vector<int> binomial_coefficient(int n)
+template<class RetIntType = unsigned int>
+std::vector<RetIntType> binomial_coefficient(int n)
 {
-	std::vector<int> result(n + 1, 1);
+	std::vector<RetIntType> result(n + 1, 1);
 	for (int i = 1; i < n; ++i)
 	{
-		int prev = 1;
+		RetIntType prev = 1;
 		for (int j = 1; j <= i; ++j)
 		{
 			std::swap(prev, result[j]);
@@ -326,8 +327,8 @@ int main(void)
 	
 	for(int i=0; i<10; i++)
 	{
-		for(int i : binomial_coefficient(i))
-			std::cout << i << "\t";
+		for(auto coeff : binomial_coefficient(i))
+			std::cout << coeff << "\t";
 		std::cout << std::endl;
 	}
 

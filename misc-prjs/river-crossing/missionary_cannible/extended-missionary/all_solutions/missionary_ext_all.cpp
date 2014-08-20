@@ -188,7 +188,7 @@ inline bool solution_found(const state& st, int boat_volume)	// check if we have
 	return (count_ones(st.mLeft)+count_ones(st.cLeft) <= boat_volume) && (st.boat_side == false);
 }
 
-// By checking bit_order, convert the bit index in real order in missionary or cannibal table index
+// By checking bit_order, convert the bit index into real order in missionary or cannibal table index
 std::vector<int> bit_index_to_index(unsigned int bit_order, int max_bits, int bit_index)
 {
 	std::vector<int> result;

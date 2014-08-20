@@ -3,9 +3,10 @@
 //    Bucket Sort
 //    Divide data into multiple buckets, and combine these buckets together.
 //
-//    This algorithm has an O(n) time complexity, the drawback is that it also has an O(n) spece complexity.
-//    Also, because of issues like cache-missing, etc, it has advantage over quick-sort/mrege-sort etc. only
-//    when data volume is quite big. Another drawback is that, it only works with integral data typess.
+//    This algorithm has an O(n) time complexity, the drawback is that it also has an O(n) space complexity.
+//    Also, because of issues like cache-missing, etc, only when data volume is quite big and this algorithm
+//    is nicely designed and implemented, could it have advantage over quick-sort/merge-sort etc.
+//    Another drawback of bucket sort is that, it only works with integral data types.
 //
 //    This is only a very simple implementation, only to demonstrate basic algorithm concepts
 //
