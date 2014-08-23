@@ -209,6 +209,47 @@ bool prev_n_1_int(IntType& cur_x, int total_bits = sizeof(IntType)* 8)
 	return true;
 }
 
+template<class BiIter>
+bool next_comb_rotate(BiIter seq_begin, BiIter seq_end, int n)
+{
+	BiIter perm_last = seq_begin + n;
+	BiIter remain;
+	BiIter remain_end = seq_end;
+	int mod_cnt = 0;
+	while (true)
+	{
+		remain = perm_last;
+		--perm_last;
+		while (remain != remain_end)
+		{
+			if (*remain > *perm_last)
+				break;
+			else
+				++remain;
+		}
+		if (remain == remain_end)
+		{
+			++mod_cnt;
+			std::rotate(perm_last, perm_last + 1, remain_end);
+			if (mod_cnt >= n)
+				return false;
+			//std::rotate(perm_last, perm_last + 1, seq_end);
+			--remain_end;
+		}
+		else
+			break;
+	}
+	if (mod_cnt == 0)
+		std::iter_swap(perm_last, remain);
+	else
+	{
+		if (*perm_last > *(perm_last + 1))
+			std::rotate(perm_last, perm_last + 1, remain);
+		std::rotate(perm_last, remain, remain + mod_cnt + 1);
+	}
+	return true;
+}
+
 
 class CombIdx
 {

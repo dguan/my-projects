@@ -116,6 +116,39 @@ bool next_perm(BiIter first, BiIter last)
 	}
 }
 
+template<class BiIter>
+bool next_perm_rotate(BiIter seq_begin, BiIter seq_end, int n)
+{
+	BiIter perm_last = seq_begin + n;
+	BiIter remain;
+	int mod_cnt = 0;
+
+	while (true)
+	{
+		remain = perm_last;
+		--perm_last;
+		while (remain != seq_end)
+		{
+			if (*remain > *perm_last)
+				break;
+			else
+				++remain;
+		}
+		if (remain == seq_end)
+		{
+			std::rotate(perm_last, perm_last + 1, seq_end);
+			++mod_cnt;
+			if (mod_cnt >= n)
+				return false;
+			//std::rotate(perm_last, perm_last + 1, seq_end);
+		}
+		else
+			break;
+	}
+	std::iter_swap(perm_last, remain);
+	return true;
+}
+
 
 class PermIdx
 {

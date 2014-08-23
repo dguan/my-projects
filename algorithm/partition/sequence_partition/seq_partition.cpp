@@ -10,19 +10,32 @@ using IterValueType = typename std::iterator_traits<Iter>::value_type;
 
 ////////////////// recursively print contents of a container ///////////////////
 template<class T>
-void print_container(const T& x)
+void do_print_container(const T& x, int& counter, int lvl, char prefix, char postfix, const char *l0_cont_delim)
 {
 	std::cout << x;
 }
-template<class T, template<class T, class ALLOC = std::allocator<T>> class CONT>
-void print_container(const CONT<T>& cont)
+template<class T, template<class T, class ALLOC = std::allocator<T>> class CONTAINER>
+void do_print_container(const CONTAINER<T>& cont, int& counter, int lvl, char prefix, char postfix, const char *l0_cont_delim)
 {
 	for (auto x : cont)
 	{
-		std::cout << "(";
-		print_container(x);
-		std::cout << ")";
+		std::cout << prefix;
+		do_print_container(x, counter, lvl+1, prefix, postfix, l0_cont_delim);
+		std::cout << postfix;
+		if (lvl == 0)
+		{
+			std::cout << l0_cont_delim;
+			++counter;
+		}
 	}
+}
+template<class T>
+int print_container(const T& cont, char prefix = '(', char postfix = ')', const char *l0_cont_delim = "  ")
+{
+	int elem_counter = 0;
+	do_print_container(cont, elem_counter, 0, prefix, postfix, l0_cont_delim);
+	std::cout << std::endl;
+	return elem_counter;
 }
 
 
@@ -430,11 +443,12 @@ int main()
 	min_part_len = 1;
 	max_part_len = 2;
 	std::cout << "partition a string : " << str << " with min and max part_len set to " << min_part_len << " and " << max_part_len << std::endl;
-	for (auto x : part_str_with_len_range(str, min_part_len, max_part_len))
-	{
-		print_container(x);
-		std::cout << std::endl;
-	}
+	std::cout << "Total " << print_container(part_str_with_len_range(str, min_part_len, max_part_len)) << std::endl;
+	//for (auto x : part_str_with_len_range(str, min_part_len, max_part_len))
+	//{
+	//	print_container(x);
+	//	std::cout << std::endl;
+	//}
 
 	num_parts = 3;
 	std::cout << "partition a string : " << str << " into " << num_parts << " parts" << std::endl;
@@ -453,29 +467,32 @@ int main()
 	std::cout << "partition a sequence : ";
 	print_container(vi);
 	std::cout << " with min and max part_len set to " << min_part_len << " and " << max_part_len << std::endl;
-	for (auto x : part_seq_with_len_range(vi, 1, 2))
-	{
-		print_container(x);
-		std::cout << std::endl;
-	}
+	std::cout << "Total " << print_container(part_seq_with_len_range(vi, 1, 2)) << std::endl;
+	//for (auto x : part_seq_with_len_range(vi, 1, 2))
+	//{
+	//	print_container(x);
+	//	std::cout << std::endl;
+	//}
 	std::cout << "partition a sequence : ";
 	print_container(vi);
 	std::cout << " with min and max part_len set to " << min_part_len << " and " << max_part_len << " using iterators" << std::endl;
-	for (auto x : part_seq_with_len_range(vi.begin(), vi.end(), 1, 2))
-	{
-		print_container(x);
-		std::cout << std::endl;
-	}
+	std::cout << "Total " << print_container(part_seq_with_len_range(vi.begin(), vi.end(), 1, 2)) << std::endl;
+	//for (auto x : part_seq_with_len_range(vi.begin(), vi.end(), 1, 2))
+	//{
+	//	print_container(x);
+	//	std::cout << std::endl;
+	//}
 
 	num_parts = 3;
 	std::cout << "partition a sequence : ";
 	print_container(vi);
 	std::cout << " into " << num_parts << " parts" << std::endl;
-	for (auto x : part_seq_into_parts(vi.begin(), vi.end(), num_parts))
-	{
-		print_container(x);
-		std::cout << std::endl;
-	}
+	std::cout << "Total " << print_container(part_seq_into_parts(vi.begin(), vi.end(), num_parts)) << std::endl;
+	//for (auto x : part_seq_into_parts(vi.begin(), vi.end(), num_parts))
+	//{
+	//	print_container(x);
+	//	std::cout << std::endl;
+	//}
 
 	return 0;
 }

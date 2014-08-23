@@ -1,3 +1,6 @@
+http://en.wikipedia.org/wiki/C%2B%2B11#Alternative_function_syntax
+*****
+
 Memoization functor wrapper in c++
 http://stackoverflow.com/questions/24637619/memoization-functor-wrapper-in-c
 

@@ -295,6 +295,13 @@ bool init_PatternMaps(PatternMap& pat_map, PatternMap& wc_map, const string& n1_
 
 int main()
 {
+    ////////////////////////////////////////////////////////////////////
+    //                                                                //
+    // g++ 8.4 does not support regex yet, so regex related code are  //
+    // commented out, these lines works in VS 2013.                   //
+    //                                                                //
+    ////////////////////////////////////////////////////////////////////
+
     {	// LookupTables initialization
         vector<LookupTable*> p_tbls{ &digits_set, &wc_uniq_char_set,              &pat_char_set,          &all_nz_char_set };
         vector<string>    init_strs{ "0123456789",      wc_uniq_chars+wc_uniq_chars_nz, pat_chars+pat_chars_nz, pat_chars_nz+wc_uniq_chars_nz };
@@ -307,6 +314,7 @@ int main()
     PatternMap pat_map, wc_map;
 
     string original_expression;
+    
     //string num_regex_str = string("[\\w|") + wc_char + wc_char_nz + wc_uniq_chars_nz_regex_str + "]+";
     //string input_regex_str = "^\\s*" + num_regex_str + "\\s+[+*/%-]\\s+" + num_regex_str + "\\s+=\\s+" + num_regex_str + "\\s*$";
     
