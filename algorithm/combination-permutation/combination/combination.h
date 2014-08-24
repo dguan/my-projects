@@ -212,17 +212,17 @@ bool prev_n_1_int(IntType& cur_x, int total_bits = sizeof(IntType)* 8)
 template<class BiIter>
 bool next_comb_rotate(BiIter seq_begin, BiIter seq_end, int n)
 {
-	BiIter perm_last = seq_begin + n;
+	BiIter comb_last = seq_begin + n;
 	BiIter remain;
 	BiIter remain_end = seq_end;
 	int mod_cnt = 0;
 	while (true)
 	{
-		remain = perm_last;
-		--perm_last;
+		remain = comb_last;
+		--comb_last;
 		while (remain != remain_end)
 		{
-			if (*remain > *perm_last)
+			if (*remain > *comb_last)
 				break;
 			else
 				++remain;
@@ -230,22 +230,22 @@ bool next_comb_rotate(BiIter seq_begin, BiIter seq_end, int n)
 		if (remain == remain_end)
 		{
 			++mod_cnt;
-			std::rotate(perm_last, perm_last + 1, remain_end);
+			std::rotate(comb_last, comb_last + 1, remain_end);
 			if (mod_cnt >= n)
 				return false;
-			//std::rotate(perm_last, perm_last + 1, seq_end);
+			//std::rotate(comb_last, comb_last + 1, seq_end);
 			--remain_end;
 		}
 		else
 			break;
 	}
 	if (mod_cnt == 0)
-		std::iter_swap(perm_last, remain);
+		std::iter_swap(comb_last, remain);
 	else
 	{
-		if (*perm_last > *(perm_last + 1))
-			std::rotate(perm_last, perm_last + 1, remain);
-		std::rotate(perm_last, remain, remain + mod_cnt + 1);
+		if (*comb_last > *(comb_last + 1))
+			std::rotate(comb_last, comb_last + 1, remain);
+		std::rotate(comb_last, remain, remain + mod_cnt + 1);
 	}
 	return true;
 }
