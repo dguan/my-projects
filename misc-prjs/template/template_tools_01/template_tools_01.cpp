@@ -42,6 +42,7 @@ int print_container(const T& cont, char prefix = '(', char postfix = ')', const 
 	return elem_counter;
 }
 
+/*
 // sort vector of vector of integer types using string and in string-like order.
 template<class IntType>
 void sort_vec_vec_int_str(std::vector<std::vector<IntType>>& cont)
@@ -50,6 +51,17 @@ void sort_vec_vec_int_str(std::vector<std::vector<IntType>>& cont)
 	{
 		return std::accumulate(a.begin(), a.end(), std::string(), [](const std::string& x, IntType y){ return x + std::string((char *)(&y), (char *)(&y) + sizeof(IntType)); }) \
 			< std::accumulate(b.begin(), b.end(), std::string(), [](const std::string& x, IntType y){ return x + std::string((char *)(&y), (char *)(&y) + sizeof(IntType)); }); \
+	});
+}
+*/
+// sort vector of vector of integer types using string and in string-like order, using reinterpret_cast instead of C-style casting to make it more 'C++'.
+template<class IntType>
+void sort_vec_vec_int_str(std::vector<std::vector<IntType>>& cont)
+{
+	std::sort(cont.begin(), cont.end(), [](const std::vector<IntType>& a, const std::vector<IntType>& b) \
+	{
+		return std::accumulate(a.begin(), a.end(), std::string(), [](const std::string& x, IntType y){ return x + std::string(reinterpret_cast<char *>(&y), reinterpret_cast<char *>(&y) + sizeof(IntType)); }) \
+			< std::accumulate(b.begin(), b.end(), std::string(), [](const std::string& x, IntType y){ return x + std::string(reinterpret_cast<char *>(&y), reinterpret_cast<char *>(&y) + sizeof(IntType)); }); \
 	});
 }
 
