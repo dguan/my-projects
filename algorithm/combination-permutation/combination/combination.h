@@ -7,8 +7,6 @@
 #include <utility>
 #include <cassert>
 
-int lexi_sn_idx(int n, int k, int comb[]);
-std::vector<int> nth_comb_idx(int lexi_sn);
 
 
 //////////////////////////////////////////////////////////////////////
@@ -34,10 +32,9 @@ template<int M, int N> struct COMBO_SUM<0, M, N>
 	enum class v : int64_t { val = 0 };
 };
 
-
 // Get the n-th order binomial coefficient using Dynamic Programming
 // The n+1 numbers correspond to C(n, 0), C(n, 1), ......, C(n, n-1), C(n, n)
-template<class RetIntType = unsigned int>
+template<class RetIntType = unsigned long>
 std::vector<RetIntType> binomial_coefficient(int n)
 {
 	std::vector<RetIntType> result(n + 1, 1);
@@ -51,6 +48,120 @@ std::vector<RetIntType> binomial_coefficient(int n)
 		}
 	}
 	return result;
+}
+
+
+// C(33, 16) = 1,166,803,110, safely in the range of an 32-bit signed integer
+// Also, combination length of 33 should be enough for most applications
+// And, if 33 is not long enough, you could try 64-bit integer, or generate the
+// combination number needed using a function
+#define MAX_COMB_SEQ_LEN 33
+
+// This is the combination number lookup table, can lookup any valid combination numbers
+// within the MAX_COMB_SEQ_LEN, say, C(0, 0), C(1, 0), C(1, 1), C(2, 0), ..., C(33, 33)
+// I stored this triangle matrix into a one dimensional array, can save 50% space.
+// For MAX_COMB_SEQ_LEN=33, it will need 34*35/2 * sizeof(unsigned long) bytes.
+unsigned long comb_coeff_array[(MAX_COMB_SEQ_LEN + 1)*(MAX_COMB_SEQ_LEN + 2) / 2];
+
+// combination number lookup table initialization function
+template<class Iterator>
+void setup_comb_coeff_table(int N, Iterator coeff_arr_begin)
+{
+	for (int i = 0; i <= N; ++i)
+		for (auto x : binomial_coefficient(i))
+			*coeff_arr_begin++ = x;
+}
+
+// Get C(n, m) -- 0 <= m <= n
+inline unsigned long get_comb_coeff(int n, int m)
+{
+	return comb_coeff_array[n*(n + 1) / 2 + m];
+}
+
+// get combination sequence in index from combination rank
+std::vector<int> comb_rank_to_idx_seq(unsigned long comb_rank, int n, int m)
+{
+	std::vector<int> idx_seq(m);
+	int seq_index = 0;
+	int cur_max = 0;
+	int sub_comb_cnt = 0;
+	while (seq_index < m)
+	{
+		int cur_comb_base = n - 1 - seq_index - sub_comb_cnt;
+		int cur_sub_comb_cnt = 0;
+		int cur_comb_choose = m - 1 - seq_index;
+		while (comb_rank >= get_comb_coeff(cur_comb_base, cur_comb_choose))
+		{
+			comb_rank -= get_comb_coeff(cur_comb_base, cur_comb_choose);
+			++cur_sub_comb_cnt;
+			--cur_comb_base;
+		}
+		cur_max += cur_sub_comb_cnt;
+		idx_seq[seq_index] = cur_max;
+		if (cur_sub_comb_cnt)
+			sub_comb_cnt += cur_sub_comb_cnt;
+		++cur_max;
+		++seq_index;
+	}
+	return idx_seq;
+}
+
+template<class InputIter>
+bool is_comb_seq(InputIter seq_begin, InputIter seq_end, int n)
+{
+	InputIter p_prev = seq_begin;
+	if (*p_prev >= n)
+		return false;
+
+	InputIter p_cur = std::next(seq_begin);
+	while (p_cur != seq_end)
+	{
+		if (*p_cur >= n || *p_cur < *p_prev)
+			return false;
+		else
+		{
+			++p_prev;
+			++p_cur;
+		}
+	}
+	return true;
+}
+
+template<class InputIter>
+unsigned long idx_seq_to_comb_rank(InputIter seq_begin, InputIter seq_end, int n)
+{
+	int m = std::distance(seq_begin, seq_end);
+	unsigned long rank = 0;
+
+	int seq_pos = 0;
+	int cur_min = 0;
+	int acc_cnt = 0;
+	InputIter p = seq_begin;
+	while (p != seq_end)
+	{
+		while (p != seq_end && *p <= cur_min)
+		{
+			++p;
+			++cur_min;
+			++seq_pos;
+		}
+		if (p == seq_end)
+			break;
+		int cur_coeff = *p - cur_min;
+		cur_min = *p + 1;
+		++p;
+		int comb_base = n - 1 - seq_pos - acc_cnt;
+		int comb_choose = m - 1 - seq_pos;
+		while (cur_coeff > 0)
+		{
+			rank += get_comb_coeff(comb_base, comb_choose);
+			--cur_coeff;
+			--comb_base;
+			++acc_cnt;
+		}
+		++seq_pos;
+	}
+	return rank;
 }
 
 

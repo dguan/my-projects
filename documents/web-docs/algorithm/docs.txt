@@ -80,6 +80,12 @@ http://docs.jboss.org/drools/release/latest/optaplanner-docs/html_single/index.h
 http://stackoverflow.com/questions/25042817/how-to-make-a-permutation-that-tailors-output-efficiently
 
 
+http://stackoverflow.com/questions/3143142/compute-rank-of-a-combination
+http://msdn.microsoft.com/en-us/library/aa289166%28VS.71%29.aspx
+*****
+
+
+
 
 
 Generating integer partition by its number

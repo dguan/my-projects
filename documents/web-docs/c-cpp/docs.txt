@@ -169,7 +169,7 @@ http://stackoverflow.com/questions/671815/what-is-the-fastest-most-efficient-way
 
 
 
-
+http://stackoverflow.com/questions/25495448/c11-templated-wrapper-function
 
 
 

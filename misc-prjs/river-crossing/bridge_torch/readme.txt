@@ -1,0 +1,1 @@
+The classic bridge-torch problem, used exhaustive DFS algorithm, not much to say, maybe use non-recursive way to solve this problem. Yet recursive method is more generic, and have the advantage of scalability, easy to be extended, like, the bridge can allow 3 or more people to  across, or the bridge has a weight limit, allow vious combination to achieve best time, etc. 
