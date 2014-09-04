@@ -1,1 +1,0 @@
-This is a lexigraphico order combination generator, and the generator's performance is quite good, from the test in the comb_test, this combination generator's performance is at least comparable with the famous STL next_permutation implementation when generating almost same amount of combinations and permutations.(Sadly there is no such next_combination in STL) 
