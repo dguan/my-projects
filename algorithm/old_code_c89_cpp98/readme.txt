@@ -1,0 +1,4 @@
+Some old codebase in C89, C++98, python, and some matlab, some of which could be dated back to 1990s. Part of the codes have been re-factored into currently most modern C++11 standards(well, as best as I could, and some codes are not so easy to change), but there're still some code in their original look.
+
+NOTE THAT, some codes are not complete, some may not even compile, some codes are not (fully) tested, and there could be errors in the code. Also, although some codes worked in old environment, it does not necessarily work in new standard or environment.
+Also, these codes are not well classified or sorted, not in good structure. They are kept here only for personal reference.
