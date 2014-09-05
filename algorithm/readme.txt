@@ -1,0 +1,5 @@
+I found that it's harder to make a good directory structure than coding. I would like to maintain one single copy of each file, but have multiple 'soft-link' like aliase to it, which cab be cross-referenced, or included without duplication. Also, some algorithms are used multiple times in other projects, or can be catagorized into different types, this make things more complicated.
+
+I believe that there must be some 'aliasing' machenism in Git allowing me to do this, but I am currently not quite familiar with this part of Git. I just classify codes roughly, and I might sub-divide codes into smaller pieces and make it truly like a library, and seperate testing codes from libraries, make all testings into different projects.
+
+This could take some time, and the directory structure may subject to frequent change.
