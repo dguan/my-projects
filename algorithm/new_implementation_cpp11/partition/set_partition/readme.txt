@@ -13,3 +13,5 @@ The Bell numbers may also be computed using the Bell triangle in which the first
 The number of partitions of an n-element set into exactly k nonempty parts is the Stirling number of the second kind S(n, k).
 
 The number of noncrossing partitions of an n-element set is the Catalan number Cn, 
+
+This project only implemented 2 recursive algoithms, I have tried to implement non-recursive using sequence partitioning algorithms but failed. It seems I need to find the ordering first, will try it later......
