@@ -38,11 +38,11 @@ ObjType *SingletonWrapper<ObjType>::GetInstance()
 	// When running in multi-threaded environments, multiple threads may
 	// call GetInstance simultaneously, causing multiple ObjType instance
 	// to be created. It will not lock anymore after the initial instantiation.
-	if (m_instance == 0)
+	if (m_instance == nullptr)
 	{
 		std::lock_guard<std::mutex> lk(m_mutex);
 
-		if (m_instance == 0)
+		if (m_instance == nullptr)
 		{
 			static ObjType obj;	// Create ObjType on stack, ObjType must be default constructible
 			m_instance = &obj;
@@ -52,7 +52,7 @@ ObjType *SingletonWrapper<ObjType>::GetInstance()
 }
 
 // instantiation of internal static members
-template< class ObjType > ObjType *SingletonWrapper<ObjType>::m_instance = 0;
+template< class ObjType > ObjType *SingletonWrapper<ObjType>::m_instance = nullptr;
 template< class ObjType > std::mutex SingletonWrapper<ObjType>::m_mutex;
 
 #endif
