@@ -15,7 +15,7 @@ private:
 	std::string m_name;
 	
 	MyClass(const MyClass&) = delete;
-	MyClass& operator = (MyClass &) = delete;
+	MyClass& operator = (const MyClass &) = delete;
 };
 
 int main()
