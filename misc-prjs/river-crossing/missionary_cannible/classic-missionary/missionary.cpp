@@ -160,17 +160,17 @@ std::string find_solution_bfs(std::queue<state>& cur_states, std::vector<std::tu
 
 int main(void)
 {
-	//const int num_missionaries = 3;
-	//const int num_cannibals = 3;
-	//const int boat_volume = 2;
+	const int num_missionaries = 3;
+	const int num_cannibals = 3;
+	const int boat_volume = 2;
 	
 	//const int num_missionaries = 6;
 	//const int num_cannibals = 6;
 	//const int boat_volume = 3;
 
-	const int num_missionaries = 100;
-	const int num_cannibals = 100;
-	const int boat_volume = 4;
+	//const int num_missionaries = 100;
+	//const int num_cannibals = 100;
+	//const int boat_volume = 4;
 
 	//const int num_missionaries = 100;
 	//const int num_cannibals = 99;
