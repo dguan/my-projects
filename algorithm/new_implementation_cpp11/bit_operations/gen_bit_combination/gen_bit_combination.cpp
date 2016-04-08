@@ -1,17 +1,18 @@
 #include <iostream>
 #include <bitset>
+#include <type_traits>
 
 
 template<class IntType>
 inline IntType first_n_1_int(int n)
 {
-	return static_cast<IntType>((IntType)(-1) >> (sizeof(IntType)*8-n));
+	return static_cast<IntType>((typename std::make_unsigned<IntType>::type(-1)) >> (sizeof(IntType)*8-n));
 }
 
 template<class IntType>
 inline IntType last_n_1_int(int n)
 {
-	return static_cast<IntType>((signed)((IntType)(-1)) & ~(((IntType)1<<(sizeof(IntType)*8-n))-1));
+	return static_cast<IntType>(((IntType)(-1)) << (sizeof(IntType)*8 -n));
 }
 
 template<class IntType>
@@ -68,8 +69,8 @@ bool prev_n_1_int(IntType& cur_x, int total_bits = sizeof(IntType)* 8)
 
 int main()
 {
-	std::cout << std::bitset<64>(first_n_1_int<long long>(64)) << std::endl;
-	std::cout << std::bitset<64>(last_n_1_int<long long>(64)) << std::endl;
+	std::cout << std::bitset<64>(first_n_1_int<unsigned long long>(62)) << std::endl;
+	std::cout << std::bitset<64>(last_n_1_int<unsigned long long>(62)) << std::endl;
 	std::cout << std::bitset<64>(first_n_1_int<unsigned long long>(63)) << std::endl;
 	std::cout << std::bitset<64>(last_n_1_int<unsigned long long>(63)) << std::endl;
 	std::cout << std::bitset<32>(first_n_1_int<unsigned int>(32)) << std::endl;
