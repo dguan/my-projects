@@ -17,7 +17,7 @@ void do_print_container(const T& x, int& counter, int lvl, char prefix, char pos
 template<class T, template<class T, class ALLOC = std::allocator<T>> class CONTAINER>
 void do_print_container(const CONTAINER<T>& cont, int& counter, int lvl, char prefix, char postfix, const char *l0_cont_delim)
 {
-	for (auto x : cont)
+	for (auto& x : cont)
 	{
 		std::cout << prefix;
 		do_print_container(x, counter, lvl+1, prefix, postfix, l0_cont_delim);
@@ -61,7 +61,7 @@ std::vector<std::vector<int>> part_len(int N)
 	{
 		for (int i = 1; i <= N; ++i)
 		{
-			for (auto vi : part_len(N - i))
+			for (auto& vi : part_len(N - i))
 			{
 				vi.insert(vi.begin(), i);
 				parts.push_back(std::move(vi));
@@ -90,7 +90,7 @@ std::vector<std::vector<int>> part_len_with_len_cap(int seq_len, int max_part_le
 	{
 		for (int i = 1; i <= max_part_len; ++i)
 		{
-			for (auto vi : part_len_with_len_cap(seq_len - i, std::min<int>(max_part_len, seq_len - i)))
+			for (auto& vi : part_len_with_len_cap(seq_len - i, std::min<int>(max_part_len, seq_len - i)))
 			{
 				vi.insert(vi.begin(), i);
 				parts.push_back(std::move(vi));
@@ -152,7 +152,7 @@ outer_container<inner_container<IntType>> part_len_with_len_range(IntType seq_le
 	{
 		for (int i = min_len; i <= max_len; ++i)
 		{
-			for (auto in_cont : part_len_with_len_range(seq_len - i, min_len, std::min<int>(max_len, seq_len - i)))
+			for (auto& in_cont : part_len_with_len_range(seq_len - i, min_len, std::min<int>(max_len, seq_len - i)))
 			{
 				in_cont.insert(in_cont.begin(), i);
 				parts.push_back(std::move(in_cont));
@@ -173,7 +173,7 @@ std::vector<std::vector<int>> part_len_into_parts(int seq_len, int num_parts)
 	}
 	for (int i = 1; i <= seq_len - num_parts + 1; ++i)
 	{
-		for (auto vi : part_len_into_parts(seq_len - i, num_parts - 1))
+		for (auto& vi : part_len_into_parts(seq_len - i, num_parts - 1))
 		{
 			vi.insert(vi.begin(), i);
 			results.push_back(std::move(vi));
@@ -208,7 +208,7 @@ std::vector<std::vector<StrType>> part_str(const StrType& str)
 		for (int i = 1; i <= str_len; ++i)
 		{
 			StrType prefix = str.substr(0, i);
-			for (auto vec_str : part_str(str.substr(i)))
+			for (auto& vec_str : part_str(str.substr(i)))
 			{
 				vec_str.insert(vec_str.begin(), prefix);
 				parts.push_back(std::move(vec_str));
@@ -239,7 +239,7 @@ std::vector<std::vector<StrType>> part_str_with_len_range(const StrType& str, in
 		for (int i = min_part_len; i <= max_part_len; ++i)
 		{
 			StrType pre = str.substr(0, i);
-			for (auto in_cont : part_str_with_len_range(str.substr(i), min_part_len, std::min<int>(max_part_len, str_len - i)))
+			for (auto& in_cont : part_str_with_len_range(str.substr(i), min_part_len, std::min<int>(max_part_len, str_len - i)))
 			{
 				in_cont.insert(in_cont.begin(), pre);
 				parts.push_back(std::move(in_cont));
@@ -265,7 +265,7 @@ std::vector<std::vector<StrType>> part_str_into_parts(const StrType& str, int nu
 	for (int i = 1; i <= str_len - num_parts + 1; ++i)
 	{
 		StrType pre = str.substr(0, i);
-		for (auto vs : part_str_into_parts(str.substr(i), num_parts-1))
+		for (auto& vs : part_str_into_parts(str.substr(i), num_parts-1))
 		{
 			vs.insert(vs.begin(), pre);
 			parts.push_back(std::move(vs));
@@ -300,7 +300,7 @@ outer_container<inner_container<DataContainer<T>>> part_seq_with_len_range(const
 		{
 			DataContainer<T> pre(seq.begin(), std::next(seq.begin(), i));
 			DataContainer<T> remain(std::next(seq.begin(), i), seq.end());
-			for (auto in_cont : part_seq_with_len_range(remain, min_part_len, std::min<int>(max_part_len, seq_len - i)))
+			for (auto& in_cont : part_seq_with_len_range(remain, min_part_len, std::min<int>(max_part_len, seq_len - i)))
 			{
 				in_cont.insert(in_cont.begin(), pre);
 				parts.push_back(std::move(in_cont));
@@ -333,7 +333,7 @@ part_seq_with_len_range(const ForwardIter seq_begin, const ForwardIter seq_end, 
 		for (int i = min_part_len; i <= max_part_len; ++i)
 		{
 			std::vector<ValueType> pre(seq_begin, std::next(seq_begin, i));
-			for (auto vvt : part_seq_with_len_range(std::next(seq_begin, i), seq_end, min_part_len, std::min<int>(max_part_len, seq_len - i)))
+			for (auto& vvt : part_seq_with_len_range(std::next(seq_begin, i), seq_end, min_part_len, std::min<int>(max_part_len, seq_len - i)))
 			{
 				vvt.insert(vvt.begin(), pre);
 				parts.push_back(std::move(vvt));
@@ -361,7 +361,7 @@ part_seq_into_parts(const ForwardIter seq_begin, const ForwardIter seq_end, int 
 	for (int i = 1; i <= seq_len - num_parts + 1; ++i)
 	{
 		std::vector<ValueType> pre(seq_begin, std::next(seq_begin, i));
-		for (auto vvt : part_seq_into_parts(std::next(seq_begin, i), seq_end, num_parts - 1))
+		for (auto& vvt : part_seq_into_parts(std::next(seq_begin, i), seq_end, num_parts - 1))
 		{
 			vvt.insert(vvt.begin(), pre);
 			parts.push_back(std::move(vvt));
@@ -369,6 +369,65 @@ part_seq_into_parts(const ForwardIter seq_begin, const ForwardIter seq_end, int 
 	}
 	return parts;
 }
+
+
+
+
+
+// partition seq_len into num_parts partitions, with min length
+// Of course, seq_len MUST >= num_parts * min_len, and MUST <= num_parts * max_len
+std::vector<std::vector<int>> part_len_into_parts_and_min(int seq_len, int num_parts, int min_len)
+{
+	std::vector<std::vector<int>> results;
+	if(seq_len < num_parts*min_len)
+		return results;
+	if (num_parts == 1)
+	{
+		results.emplace_back(1, seq_len);
+		return results;
+	}
+
+	for (int i = min_len; i <= seq_len - (num_parts-1)*min_len; ++i)
+	{
+		for (auto& vi : part_len_into_parts_and_min(seq_len - i, num_parts - 1, min_len))
+		{
+			vi.insert(vi.begin(), i);
+			results.push_back(std::move(vi));
+		}
+	}
+	return results;
+}
+
+
+
+
+// partition seq_len into num_parts partitions, with min and max length
+// Of course, seq_len MUST >= num_parts * min_len, and MUST <= num_parts * max_len
+std::vector<std::vector<int>> part_len_into_parts_and_range(int seq_len, int num_parts, int min_len, int max_len)
+{
+	std::vector<std::vector<int>> results;
+	if(seq_len < num_parts*min_len || seq_len > num_parts*max_len)
+		return results;
+	if (num_parts == 1)
+	{
+		results.emplace_back(1, seq_len);
+		return results;
+	}
+	for (int i = min_len; i <= max_len; ++i)
+	{
+		for (auto& vi : part_len_into_parts_and_range(seq_len - i, num_parts - 1, min_len, max_len))
+		{
+			vi.insert(vi.begin(), i);
+			results.push_back(std::move(vi));
+		}
+	}
+	return results;
+}
+
+
+
+
+
 
 
 int main()
@@ -413,8 +472,8 @@ int main()
 	}
 	std::cout << "Altogether " << cnt << " partitions" << std::endl;
 
-	seq_len = 7;
-	int num_parts = 2;
+	seq_len = 16;
+	int num_parts = 4;
 	cnt = 0;
 	std::cout << "partition a sequence of length " << seq_len << " into " << num_parts << " parts" << std::endl;
 	for (auto vi : part_len_into_parts(seq_len, num_parts))
@@ -493,6 +552,16 @@ int main()
 	//	print_container(x);
 	//	std::cout << std::endl;
 	//}
+	
+	std::cout << std::endl << std::endl;
+	std::cout << "****** partition a length into parts with min len ******" << std::endl;
+	std::vector<std::vector<int>> p_n_m = std::move(part_len_into_parts_and_min(16, 4, 3));
+	std::cout << "Total " << print_container(p_n_m) << std::endl;
+
+	std::cout << std::endl << std::endl;
+	std::cout << "****** partition a length into parts with min and max len ******" << std::endl;
+	std::vector<std::vector<int>> p_n_r = std::move(part_len_into_parts_and_range(16, 4, 3, 6));
+	std::cout << "Total " << print_container(p_n_r) << std::endl;
 
 	return 0;
 }

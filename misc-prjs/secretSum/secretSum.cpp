@@ -107,7 +107,7 @@ vector<string> gen_num(const PatternMap& pat_map, const PatternMap& wc_map, cons
         }
         else
         {
-			availables = find_availables(pat_char_set.find(num_pat[pat_pos]) != pat_char_set.cend() ? pat_map : wc_map, num_pat[pat_pos], 0);
+			availables = std::move(find_availables(pat_char_set.find(num_pat[pat_pos]) != pat_char_set.cend() ? pat_map : wc_map, num_pat[pat_pos], 0));
             break;
         }
     }
@@ -121,7 +121,7 @@ vector<string> gen_num(const PatternMap& pat_map, const PatternMap& wc_map, cons
     }
 	else if (num_pat[pat_pos]==wc_char || num_pat[pat_pos] == wc_char_nz)
 	{
-		vector<string> sub_pat_strs = gen_num(pat_map, wc_map, num_pat.substr(pat_pos + 1));
+		vector<string> sub_pat_strs = std::move(gen_num(pat_map, wc_map, num_pat.substr(pat_pos + 1)));
 		if (sub_pat_strs.size())
 			for (auto ch : availables)
 				for (auto sps : sub_pat_strs)
@@ -136,9 +136,9 @@ vector<string> gen_num(const PatternMap& pat_map, const PatternMap& wc_map, cons
         {
 			x_map[num_pat[pat_pos]] = ch;
 			if (is_pat_char)
-				sub_pat_strs = gen_num(x_map, wc_map, num_pat.substr(pat_pos+1));
+				sub_pat_strs = std::move(gen_num(x_map, wc_map, num_pat.substr(pat_pos+1)));
 			else
-				sub_pat_strs = gen_num(pat_map, x_map, num_pat.substr(pat_pos+1));
+				sub_pat_strs = std::move(gen_num(pat_map, x_map, num_pat.substr(pat_pos+1)));
             for(auto sps : sub_pat_strs)
                 results.emplace_back(leading_str + ch + sps);
         }
@@ -226,7 +226,7 @@ void get_range_results(const vector<string>& n1_strs, int data_low, int data_hig
 				continue;
 		}
 
-		vector<string> n2_strs = gen_num(n1_pat_map, n1_wc_map, num2_pat);
+		vector<string> n2_strs = std::move(gen_num(n1_pat_map, n1_wc_map, num2_pat));
 		for (auto n2 : n2_strs)
 		{
 			int y = atoi(n2.c_str());
@@ -340,9 +340,12 @@ int main()
         }
 
         auto t0 = chrono::high_resolution_clock::now();
+        
+        const int MaxThreads = 32; // Maximum number of threads
+        const int TimeDelay = 100; // Time delay in milliseconds
 
-        vector<string> n1_strs = gen_num(pat_map, wc_map, n1_pat);
-        int data_step = n1_strs.size() <= 10 ? 1 : (n1_strs.size() + 9) / 10;
+        vector<string> n1_strs = std::move(gen_num(pat_map, wc_map, n1_pat));
+        int data_step = n1_strs.size() <= MaxThreads ? 1 : (n1_strs.size() + MaxThreads) / MaxThreads;
         int total_solutions = 0;
         vector<std::thread> thrds;
         unsigned int low = 0;
@@ -367,7 +370,7 @@ int main()
                 g_queue_mutex.unlock();
             }
             cerr << '.';
-            this_thread::sleep_for(std::chrono::milliseconds(100));
+            this_thread::sleep_for(std::chrono::milliseconds(TimeDelay));
         }
         while (!g_results_queue.empty())
         {

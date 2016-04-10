@@ -211,8 +211,9 @@ if __name__ == '__main__' :
 
         pats = re.split(r'\s*', re.sub(r'^\s+|\s*$', '', expression)) # split expression into 5 parts
         n1s = generate_nums(pats[0], {}, {}) # Find all available num1s using its pattern
-
-        n1_step = 1 if len(n1s)<=10 else int((len(n1s)+9)/10) # setup up to 10 processes
+        
+        max_threads = 32
+        n1_step = 1 if len(n1s)<=max_threads else int((len(n1s)+max_threads-1)/max_threads) # setup up to max_threads processes
         n1_div = range(0, len(n1s), n1_step) + [len(n1s)]
         processes = []
         active_proc_cnt = 0

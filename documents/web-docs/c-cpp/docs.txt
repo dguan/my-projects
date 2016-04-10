@@ -180,6 +180,10 @@ http://home.roadrunner.com/~hinnant/combinations.html
 
 
 
+http://stackoverflow.com/questions/16377736/stdmake-signed-that-accepts-floating-point-types
+
+
+
 
 
 
