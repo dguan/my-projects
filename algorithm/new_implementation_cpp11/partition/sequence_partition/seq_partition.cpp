@@ -17,7 +17,7 @@ void do_print_container(const T& x, int& counter, int lvl, char prefix, char pos
 template<class T, template<class T, class ALLOC = std::allocator<T>> class CONTAINER>
 void do_print_container(const CONTAINER<T>& cont, int& counter, int lvl, char prefix, char postfix, const char *l0_cont_delim)
 {
-	for (auto& x : cont)
+	for (const auto& x : cont)
 	{
 		std::cout << prefix;
 		do_print_container(x, counter, lvl+1, prefix, postfix, l0_cont_delim);
