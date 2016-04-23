@@ -57,15 +57,16 @@ std::vector<std::vector<int>> get_multi_comb_idx_bits(int *grp_cnts, int num_grp
 	if (num_grps == 1)
 	{
 		if (combo_cnt == 0)
-			results.push_back(std::vector<int>(1, 0));
+			results.emplace_back(1, 0);
 		else if (grp_cnts[0] >= combo_cnt)
 		{
-			for (auto vi : get_all_combs_idx(grp_cnts[0], combo_cnt))
+			std::vector<std::vector<int>> aci = std::move(get_all_combs_idx(grp_cnts[0], combo_cnt));
+			for (auto& vi : aci)
 			{
 				int this_grp_comb = 0;
 				for (int i : vi)
 					this_grp_comb |= (1 << i);
-				results.push_back(std::vector<int>(1, this_grp_comb));
+				results.emplace_back(1, this_grp_comb);
 			}
 		}
 	}
@@ -85,14 +86,15 @@ std::vector<std::vector<int>> get_multi_comb_idx_bits(int *grp_cnts, int num_grp
 			if (i == 0)
 				comb_0.push_back(std::vector<int>());
 			else
-				comb_0 = get_all_combs_idx(grp_cnts[0], i);
+				comb_0 = std::move(get_all_combs_idx(grp_cnts[0], i));
 
-			for (auto c : comb_0)
+			for (auto& c : comb_0)
 			{
 				int grp_cnt_0 = 0;
 				for (int i : c)
 					grp_cnt_0 |= (1 << i);
-				for (auto vi : get_multi_comb_idx_bits(grp_cnts + 1, num_grps - 1, combo_cnt - i))
+				std::vector<std::vector<int>> mcib = std::move(get_multi_comb_idx_bits(grp_cnts + 1, num_grps - 1, combo_cnt - i));
+				for (auto& vi : mcib)
 				{
 					vi.insert(vi.begin(), grp_cnt_0);
 					results.push_back(std::move(vi));
@@ -185,11 +187,11 @@ inline bool	is_safe_mov(int nml, int ncl, int nmr, int ncr)	// check if a move s
 
 inline bool solution_found(const state& st, int boat_volume)	// check if we have found a solution
 {
-	return (count_ones(st.mLeft)+count_ones(st.cLeft) <= boat_volume) && (st.boat_side == false);
+	return (count_ones(st.mLeft) + count_ones(st.cLeft) <= boat_volume) && (st.boat_side == false);
 }
 
 // By checking bit_order, convert the bit index into real order in missionary or cannibal table index
-std::vector<int> bit_index_to_index(unsigned int bit_order, int max_bits, int bit_index)
+std::vector<int> bit_index_to_real_index(unsigned int bit_order, int max_bits, int bit_index)
 {
 	std::vector<int> result;
 
@@ -248,14 +250,20 @@ std::vector<state> get_safe_movs(const state& st, int boat_volume, const UsedSta
 	if (st.boat_side)	// Search strategy, if the boat is at the other side, choose fewer people first
 	{
 		for (int i = 1; i <= boat_volume; ++i)
-		for (auto gc : get_multi_comb_idx_bits(grps, 2, i))
-			possible_combos.push_back(std::move(gc));
+		{
+			auto mcib = std::move(get_multi_comb_idx_bits(grps, 2, i));
+			for (auto& gc : mcib)
+				possible_combos.push_back(std::move(gc));
+		}
 	}
 	else // Search strategy, try to take as many as possible people to the other side first
 	{
 		for (int i = boat_volume; i >= 1; --i)
-		for (auto gc : get_multi_comb_idx_bits(grps, 2, i))
-			possible_combos.push_back(std::move(gc));
+		{
+			auto mcib = std::move(get_multi_comb_idx_bits(grps, 2, i));
+			for (auto& gc : mcib)
+				possible_combos.push_back(std::move(gc));
+		}
 	}
 
 	for (auto pc : possible_combos)
@@ -273,8 +281,8 @@ std::vector<state> get_safe_movs(const state& st, int boat_volume, const UsedSta
 		int min_m_time = std::numeric_limits<int>::max();
 		int min_c_time = std::numeric_limits<int>::max();
 
-		std::vector<int> m_bit_index = std::move(bit_index_to_index(m_from, g_Missionary_N, pc[0]));
-		std::vector<int> c_bit_index = std::move(bit_index_to_index(c_from, g_Cannibal_N, pc[1]));
+		std::vector<int> m_bit_index = std::move(bit_index_to_real_index(m_from, g_Missionary_N, pc[0]));
+		std::vector<int> c_bit_index = std::move(bit_index_to_real_index(c_from, g_Cannibal_N, pc[1]));
 
 		if (!m_bit_index.empty())
 			min_m_time = missionaries[m_bit_index[0]];	//because missionaries and m_bit_index are all sorted, so the first is the shortest in time
@@ -283,7 +291,7 @@ std::vector<state> get_safe_movs(const state& st, int boat_volume, const UsedSta
 
 		for (int i : m_bit_index)	// move the missionaries from this state to next state
 		{
-			m_from &= (~(1<<i));
+			m_from &= (~(1 << i));
 			m_to |= (1 << i);
 		}
 		for (int i : c_bit_index)	// move the cannibals from this state to next state
@@ -347,7 +355,7 @@ std::vector<std::tuple<int, std::string>> find_solution_dfs(const state& cur_st,
 					min_c_time = time;
 			}
 		}
-		solutions.emplace_back(cur_st.time + std::min(min_m_time, min_c_time),  s + "-> ");
+		solutions.emplace_back(cur_st.time + std::min(min_m_time, min_c_time), s + "-> ");
 		return solutions;
 	}
 	else
@@ -357,7 +365,7 @@ std::vector<std::tuple<int, std::string>> find_solution_dfs(const state& cur_st,
 		key <<= INTEGER_BITS;
 		key |= ((cur_st.cLeft << 1) | (cur_st.boat_side ? 0x1 : 0));
 		auto iter = used_states.find(key);
-		if(iter != used_states.end())
+		if (iter != used_states.end())
 		{
 			if (cur_st.time < iter->second)
 				iter->second = cur_st.time;
@@ -365,15 +373,18 @@ std::vector<std::tuple<int, std::string>> find_solution_dfs(const state& cur_st,
 		}
 		if (!found)
 			used_states.emplace(key, cur_st.time);
-		for (auto gsm : get_safe_movs(cur_st, boat_volume, used_states))
+		std::vector<state>safeMovs = std::move(get_safe_movs(cur_st, boat_volume, used_states));
+		for (auto& gsm : safeMovs)
 		{
-			for(auto tpl : find_solution_dfs(gsm, boat_volume, used_states))
+			std::vector<std::tuple<int, std::string>> tempResults = std::move(find_solution_dfs(gsm, boat_volume, used_states));
+			for (auto& tpl : tempResults)
 				solutions.push_back(std::move(tpl));
 		}
 	}
 	return solutions;
 }
 
+/*
 std::vector<std::tuple<int, std::string>> find_solution_bfs(std::queue<state>& cur_states, int boat_volume, UsedStateTable& used_states)
 {
 	std::vector<std::tuple<int, std::string>> solutions;
@@ -395,7 +406,9 @@ std::vector<std::tuple<int, std::string>> find_solution_bfs(std::queue<state>& c
 		if (!found)
 			used_states.emplace(key, st.time);
 
-		for (auto gc : get_safe_movs(st, boat_volume, used_states))
+		std::vector<state> safeMovs = std::move(get_safe_movs(st, boat_volume, used_states));
+
+		for (auto& gc : safeMovs)
 		{
 			if (solution_found(gc, boat_volume))
 			{
@@ -422,7 +435,7 @@ std::vector<std::tuple<int, std::string>> find_solution_bfs(std::queue<state>& c
 							min_c_time = time;
 					}
 				}
-				solutions.push_back(std::tuple<int, std::string>(gc.time + std::min(min_m_time, min_c_time), s + "-> "));
+				solutions.emplace_back(gc.time + std::min(min_m_time, min_c_time), s + "-> ");
 			}
 			else
 				cur_states.push(std::move(gc));
@@ -430,19 +443,19 @@ std::vector<std::tuple<int, std::string>> find_solution_bfs(std::queue<state>& c
 	}
 	return solutions;
 }
-
+*/
 
 int main(void)
 {
-	for (auto vi : get_all_combs_idx(5, 3))
+	for (auto& vi : get_all_combs_idx(5, 3))
 	{
 		for (auto i : vi)
 			std::cout << i << ",  ";
 		std::cout << std::endl;
 	}
 	int grp_cnts[] = { 3, 2, 2 };
-	std::vector<std::vector<int>> multi_idxs_bits = get_multi_comb_idx_bits(grp_cnts, 3, 3);
-	for (auto vi : multi_idxs_bits)
+	std::vector<std::vector<int>> multi_idxs_bits = std::move(get_multi_comb_idx_bits(grp_cnts, 3, 3));
+	for (auto& vi : multi_idxs_bits)
 	{
 		for (auto i : vi)
 		{
@@ -464,22 +477,23 @@ int main(void)
 	std::cout << std::endl << "******************** DFS algorithm *********************" << std::endl << std::endl;
 
 	UsedStateTable used_states;
-	auto dfs_solutions = find_solution_dfs(state((1<<missionaries.size())-1, (1<<cannibals.size())-1, 0, 0, false, "", 0), boat_volume, used_states);
+	auto dfs_solutions = std::move(find_solution_dfs(state((1 << missionaries.size()) - 1, (1 << cannibals.size()) - 1, 0, 0, false, "", 0), boat_volume, used_states));
 
 	std::sort(dfs_solutions.begin(), dfs_solutions.end(), [&](const std::tuple<int, std::string>& a, const std::tuple<int, std::string>& b) { return std::get<0>(a) < std::get<0>(b); });
-	for (auto x : dfs_solutions)
+	for (auto const & x : dfs_solutions)
 		std::cout << std::get<0>(x) << " :: " << std::get<1>(x) << std::endl << std::endl;
+
 /*
 	std::cout << std::endl << "******************** BFS algorithm *********************" << std::endl << std::endl;
 
 	std::queue<state> q_states;
 	used_states.clear();
 	q_states.push(state((1<<missionaries.size())-1, (1<<cannibals.size())-1, 0, 0, false, "", 0));
-	auto bfs_solutions = find_solution_bfs(q_states, boat_volume, used_states);
+	auto bfs_solutions = std::move(find_solution_bfs(q_states, boat_volume, used_states));
 
 	std::sort(bfs_solutions.begin(), bfs_solutions.end(), [&](const std::tuple<int, std::string>& a, const std::tuple<int, std::string>& b) { return std::get<0>(a) < std::get<0>(b); });
-	for (auto x : bfs_solutions)
-		std::cout << std::get<0>(x) << " :: " << std::get<1>(x) << std::endl << std::endl;
+	for (auto const & x : bfs_solutions)
+	std::cout << std::get<0>(x) << " :: " << std::get<1>(x) << std::endl << std::endl;
 */
 	if (!dfs_solutions.empty())
 	{
