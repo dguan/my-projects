@@ -60,7 +60,7 @@ std::vector<std::vector<int>> get_multi_comb_idx_bits(int *grp_cnts, int num_grp
 			results.push_back(std::vector<int>(1, 0));
 		else if (grp_cnts[0] >= combo_cnt)
 		{
-			for (auto vi : get_all_combs_idx(grp_cnts[0], combo_cnt))
+			for (auto& vi : get_all_combs_idx(grp_cnts[0], combo_cnt))
 			{
 				int this_grp_comb = 0;
 				for (int i : vi)
@@ -85,14 +85,14 @@ std::vector<std::vector<int>> get_multi_comb_idx_bits(int *grp_cnts, int num_grp
 			if (i == 0)
 				comb_0.push_back(std::vector<int>());
 			else
-				comb_0 = get_all_combs_idx(grp_cnts[0], i);
+				comb_0 = std::move(get_all_combs_idx(grp_cnts[0], i));
 
-			for (auto c : comb_0)
+			for (auto& c : comb_0)
 			{
 				int grp_cnt_0 = 0;
 				for (int i : c)
 					grp_cnt_0 |= (1 << i);
-				for (auto vi : get_multi_comb_idx_bits(grp_cnts + 1, num_grps - 1, combo_cnt - i))
+				for (auto& vi : get_multi_comb_idx_bits(grp_cnts + 1, num_grps - 1, combo_cnt - i))
 				{
 					vi.insert(vi.begin(), grp_cnt_0);
 					results.push_back(std::move(vi));
@@ -114,9 +114,9 @@ std::vector<std::vector<int>> get_multi_comb_idx_bits(int *grp_cnts, int num_grp
 // Both DFS and BFS give out correct answer 20, but,
 // DFS has only 30 solutions, while BFS has 8100!
 // Make sure to have the 2 tables sorted first!
-//const std::vector<int> missionaries{ 4, 5, 6 };
-//const std::vector<int> cannibals{ 1, 2, 3 };
-//const int boat_volume = 2;
+const std::vector<int> missionaries{ 4, 5, 6 };
+const std::vector<int> cannibals{ 1, 2, 3 };
+const int boat_volume = 2;
 
 // Both DFS and BFS give out correct answer 28, but, DFS solutions
 // increased to 264, while BFS solutions jumped to 944784! So it will
@@ -136,9 +136,9 @@ std::vector<std::vector<int>> get_multi_comb_idx_bits(int *grp_cnts, int num_grp
 //const int boat_volume = 3;
 
 // Total 1584 DFS solutions, best time 15
-const std::vector<int> missionaries{ 2, 4, 5, 6, 8 };
-const std::vector<int> cannibals{ 1, 2, 3, 4, 5 };
-const int boat_volume = 3;
+//const std::vector<int> missionaries{ 2, 4, 5, 6, 8 };
+//const std::vector<int> cannibals{ 1, 2, 3, 4, 5 };
+//const int boat_volume = 3;
 
 // Total 73086 DFS solutions, best time 9, one of the best solution is:
 // m2m4c1c2-> m2c1<- m2m5c1c3-> m2c1<- m2m5c1c4-> m5c1<- m6m8c1c5-> m6c1<- m5m6c1c6->
@@ -205,7 +205,7 @@ inline bool solution_found(const state& st, int boat_volume)	// check if we have
 }
 
 // By checking bit_order, convert the bit index into real order in missionary or cannibal table index
-std::vector<int> bit_index_to_index(unsigned int bit_order, int max_bits, int bit_index)
+std::vector<int> bit_index_to_real_index(unsigned int bit_order, int max_bits, int bit_index)
 {
 	std::vector<int> result;
 
@@ -264,17 +264,17 @@ std::vector<state> get_safe_movs(const state& st, int boat_volume, const UsedSta
 	if (st.boat_side)	// Search strategy, if the boat is at the other side, choose fewer people first
 	{
 		for (int i = 1; i <= boat_volume; ++i)
-		for (auto gc : get_multi_comb_idx_bits(grps, 2, i))
+		for (auto& gc : get_multi_comb_idx_bits(grps, 2, i))
 			possible_combos.push_back(std::move(gc));
 	}
 	else // Search strategy, try to take as many as possible people to the other side first
 	{
 		for (int i = boat_volume; i >= 1; --i)
-		for (auto gc : get_multi_comb_idx_bits(grps, 2, i))
+		for (auto& gc : get_multi_comb_idx_bits(grps, 2, i))
 			possible_combos.push_back(std::move(gc));
 	}
 
-	for (auto pc : possible_combos)
+	for (auto& pc : possible_combos)
 	{
 		unsigned int ml = st.mLeft;
 		unsigned int cl = st.cLeft;
@@ -289,8 +289,8 @@ std::vector<state> get_safe_movs(const state& st, int boat_volume, const UsedSta
 		int min_m_time = std::numeric_limits<int>::max();
 		int min_c_time = std::numeric_limits<int>::max();
 
-		std::vector<int> m_bit_index = std::move(bit_index_to_index(m_from, g_Missionary_N, pc[0]));
-		std::vector<int> c_bit_index = std::move(bit_index_to_index(c_from, g_Cannibal_N, pc[1]));
+		std::vector<int> m_bit_index = std::move(bit_index_to_real_index(m_from, g_Missionary_N, pc[0]));
+		std::vector<int> c_bit_index = std::move(bit_index_to_real_index(c_from, g_Cannibal_N, pc[1]));
 
 		if (!m_bit_index.empty())
 			min_m_time = missionaries[m_bit_index[0]];	//because missionaries and m_bit_index are all sorted, so the first is the shortest in time
@@ -384,7 +384,7 @@ void find_solution_dfs(const state& cur_st, int boat_volume, UsedStateTable& use
 		}
 		if (!found)
 			used_states.emplace(key, cur_st.time);
-		for (auto gsm : get_safe_movs(cur_st, boat_volume, used_states))
+		for (auto& gsm : get_safe_movs(cur_st, boat_volume, used_states))
 			find_solution_dfs(gsm, boat_volume, used_states);
 	}
 }
@@ -409,7 +409,7 @@ void find_solution_bfs(std::queue<state>& cur_states, int boat_volume, UsedState
 		if (!found)
 			used_states.emplace(key, st.time);
 
-		for (auto gc : get_safe_movs(st, boat_volume, used_states))
+		for (auto& gc : get_safe_movs(st, boat_volume, used_states))
 		{
 			if (gc.time >= g_BestTime)
 				continue;
@@ -454,7 +454,7 @@ void find_solution_bfs(std::queue<state>& cur_states, int boat_volume, UsedState
 
 int main(void)
 {
-	for (auto vi : get_all_combs_idx(5, 3))
+	for (auto& vi : get_all_combs_idx(5, 3))
 	{
 		for (auto i : vi)
 			std::cout << i << ",  ";
@@ -462,7 +462,7 @@ int main(void)
 	}
 	int grp_cnts[] = { 3, 2, 2 };
 	std::vector<std::vector<int>> multi_idxs_bits = get_multi_comb_idx_bits(grp_cnts, 3, 3);
-	for (auto vi : multi_idxs_bits)
+	for (auto& vi : multi_idxs_bits)
 	{
 		for (auto i : vi)
 		{
