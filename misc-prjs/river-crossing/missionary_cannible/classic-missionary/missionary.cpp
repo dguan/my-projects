@@ -53,8 +53,8 @@ std::vector<std::vector<int>> get_combo(const int *item_cnts, int n_items, int m
 
 	for (int i = std::min(max_num_combo, item_cnts[0]); i >= 0; --i)
 	{
-		std::vector<std::vector<int>> partial_results = get_combo(item_cnts + 1, n_items - 1, max_num_combo - i);
-		for (auto pr : partial_results)
+		std::vector<std::vector<int>> partial_results = std::move(get_combo(item_cnts + 1, n_items - 1, max_num_combo - i));
+		for (auto& pr : partial_results)
 		{
 			pr.insert(pr.begin(), i);
 			results.push_back(pr);
@@ -69,14 +69,14 @@ std::vector<state> get_safe_movs(const state& st, int boat_volume, const std::ve
 	std::vector<std::vector<int>> possible_combos;
 	if (st.boat_side)
 		for (int i = 1; i <= boat_volume; ++i)
-			for (auto gc : get_combo(st.status + 2, 2, i))
+			for (auto& gc : get_combo(st.status + 2, 2, i))
 				possible_combos.push_back(std::move(gc));
 	else
 		for (int i = boat_volume; i >= 1;  --i)
-			for (auto gc : get_combo(st.status, 2, i))
+			for (auto& gc : get_combo(st.status, 2, i))
 				possible_combos.push_back(std::move(gc));
 
-	for (auto pc : possible_combos)
+	for (auto& pc : possible_combos)
 	{
 		int nml = st.boat_side ? st.status[0] + pc[0] : st.status[0] - pc[0];	// num of missionaries on the left side
 		int ncl = st.boat_side ? st.status[1] + pc[1] : st.status[1] - pc[1];	// num of cannibals on the left side
@@ -86,7 +86,7 @@ std::vector<state> get_safe_movs(const state& st, int boat_volume, const std::ve
 		if (!is_safe_mov(nml, ncl, nmr, ncr))
 			continue;
 		bool found = false;
-		for (auto us : used_states)
+		for (auto& us : used_states)
 		{
 			if (!st.boat_side == std::get<2>(us) && nml == std::get<0>(us) && ncl == std::get<1>(us))
 			{
@@ -121,7 +121,7 @@ std::string find_solution_dfs(const state& cur_state, std::vector<std::tuple<int
 	else
 	{
 		used_states.emplace_back(cur_state.status[0], cur_state.status[1], cur_state.boat_side);
-		std::vector<state> safe_movs = get_safe_movs(cur_state, boat_volume, used_states);
+		std::vector<state> safe_movs = std::move(get_safe_movs(cur_state, boat_volume, used_states));
 
 		for (unsigned int i = 0; i < safe_movs.size(); ++i)
 		{
@@ -140,7 +140,7 @@ std::string find_solution_bfs(std::queue<state>& cur_states, std::vector<std::tu
 		state st = cur_states.front();
 		cur_states.pop();
 		used_states.emplace_back(st.status[0], st.status[1], st.boat_side);
-		for (auto gc : get_safe_movs(st, boat_volume, used_states))
+		for (auto& gc : get_safe_movs(st, boat_volume, used_states))
 		{
 			if (solution_found(gc, boat_volume))
 			{
@@ -152,7 +152,7 @@ std::string find_solution_bfs(std::queue<state>& cur_states, std::vector<std::tu
 				return s + "-> ";
 			}
 			else
-				cur_states.push(gc);
+				cur_states.push(std::move(gc));
 		}
 	}
 	return "No Solution";
