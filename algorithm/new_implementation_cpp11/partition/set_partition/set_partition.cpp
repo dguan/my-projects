@@ -10,7 +10,7 @@ void do_print_container(const T& x, int& counter, int lvl, char prefix, char pos
 template<class T, template<class T, class ALLOC = std::allocator<T>> class CONTAINER>
 void do_print_container(const CONTAINER<T>& cont, int& counter, int lvl, char prefix, char postfix, const char *l0_cont_delim)
 {
-	for (auto x : cont)
+	for (auto& x : cont)
 	{
 		std::cout << prefix;
 		do_print_container(x, counter, lvl + 1, prefix, postfix, l0_cont_delim);
@@ -44,7 +44,7 @@ std::vector<std::vector<std::vector<int>>> set_partition_idx(int N)
 		parts.push_back(temp);
 		return parts;
 	}
-	for (auto vvi : set_partition_idx(N-1))
+	for (auto& vvi : set_partition_idx(N-1))
 	{
 		for (unsigned int i = 0; i < vvi.size(); ++i)
 		{
@@ -70,7 +70,7 @@ std::vector<std::vector<int>> set_partition_bit(int N)
 		parts.emplace_back(1, 1);
 		return parts;
 	}
-	for (auto vi : set_partition_bit(N - 1))
+	for (auto& vi : set_partition_bit(N - 1))
 	{
 		for (unsigned int i = 0; i < vi.size(); ++i)
 		{

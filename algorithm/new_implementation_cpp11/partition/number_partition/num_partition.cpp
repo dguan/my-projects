@@ -17,7 +17,7 @@ std::vector<std::vector<int>> partition_inc(int N, int cur_min)
 	{
 		if (cur_min < i)
 			cur_min = i;
-		for (auto x : partition_inc(N - i, cur_min))
+		for (auto& x : partition_inc(N - i, cur_min))
 		{
 			x.insert(x.begin(), i);
 			results.push_back(std::move(x));
@@ -40,7 +40,7 @@ std::vector<std::vector<int>> partition_dec(int N, int cur_max)
 			cur_max = i;
 		else
 			cur_max = N - i;
-		for (auto x : partition_dec(N-i, cur_max))
+		for (auto& x : partition_dec(N-i, cur_max))
 		{
 			x.insert(x.begin(), i);
 			results.push_back(std::move(x));
@@ -66,7 +66,7 @@ std::vector<std::vector<int>> partition_n(int N, int parts, int cur_min)
 	{
 		if (cur_min < i)
 			cur_min = i;
-		for (auto x : partition_n(N - i, parts - 1, cur_min))
+		for (auto& x : partition_n(N - i, parts - 1, cur_min))
 		{
 			x.insert(x.begin(), i);
 			results.push_back(std::move(x));
@@ -79,7 +79,7 @@ std::vector<std::vector<int>> partition_parts(int N)
 {
 	std::vector<std::vector<int>> results;
 	for (int i = 1; i <= N; ++i)
-		for (auto pn : partition_n(N, i, 1))
+		for (auto& pn : partition_n(N, i, 1))
 			results.push_back(std::move(pn));
 	return results;
 }
@@ -152,7 +152,7 @@ int main()
 	for (int i = 0; i < 10; ++i)
 	{
 		std::cout << "*** incremental partition of number " << i << " ***" << std::endl;
-		for (auto vi : partition_inc(i, 1))
+		for (auto& vi : partition_inc(i, 1))
 		{
 			for (int x : vi)
 				std::cout << x << ", ";
@@ -165,7 +165,7 @@ int main()
 	for (int i = 0; i < 10; ++i)
 	{
 		std::cout << "*** decremental partition of number " << i << " ***" << std::endl;
-		for (auto vi : partition_dec(i, i))
+		for (auto& vi : partition_dec(i, i))
 		{
 			for (int x : vi)
 				std::cout << x << ", ";
@@ -178,7 +178,7 @@ int main()
 	for (int i = 0; i < 10; ++i)
 	{
 		std::cout << "*** partition in parts of number " << i << " ***" << std::endl;
-		for (auto vi : partition_parts(i))
+		for (auto& vi : partition_parts(i))
 		{
 			for (int x : vi)
 				std::cout << x << ", ";

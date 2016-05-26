@@ -449,7 +449,7 @@ int main()
 	int part_len_cap = 2;
 	cnt = 0;
 	std::cout << "partition a sequence of length " << seq_len << " with part_len cap set to " << part_len_cap << std::endl;
-	for (auto vi : part_len_with_len_cap(seq_len, part_len_cap))
+	for (auto& vi : part_len_with_len_cap(seq_len, part_len_cap))
 	{
 		for (auto i : vi)
 			std::cout << i << ", ";
@@ -463,7 +463,7 @@ int main()
 	int max_part_len = 3;
 	cnt = 0;
 	std::cout << "partition a sequence of length " << seq_len << " with min and max part_len set to " << min_part_len << " and " << max_part_len << std::endl;
-	for (auto vi : part_len_with_len_range(seq_len, min_part_len, max_part_len))
+	for (auto& vi : part_len_with_len_range(seq_len, min_part_len, max_part_len))
 	{
 		for (auto i : vi)
 			std::cout << i << ", ";
@@ -476,7 +476,7 @@ int main()
 	int num_parts = 4;
 	cnt = 0;
 	std::cout << "partition a sequence of length " << seq_len << " into " << num_parts << " parts" << std::endl;
-	for (auto vi : part_len_into_parts(seq_len, num_parts))
+	for (auto& vi : part_len_into_parts(seq_len, num_parts))
 	{
 		for (auto i : vi)
 			std::cout << i << ", ";
@@ -511,7 +511,7 @@ int main()
 
 	num_parts = 3;
 	std::cout << "partition a string : " << str << " into " << num_parts << " parts" << std::endl;
-	for (auto x : part_str_into_parts(str, num_parts))
+	for (auto& x : part_str_into_parts(str, num_parts))
 	{
 		print_container(x);
 		std::cout << std::endl;

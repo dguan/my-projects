@@ -45,7 +45,7 @@ string find_availables(const PatternMap& x_map, char x_char, char expected)
             for(char c = start_ch; c<='9'; ++c)
             {
                 bool not_found = true;
-                for(auto x : x_map)
+                for(auto& x : x_map)
                 {
                     if(x.second == c)
                     {
@@ -65,7 +65,7 @@ string find_availables(const PatternMap& x_map, char x_char, char expected)
         if(citr->second == 0)
         {
             bool found = false;
-            for(auto x : x_map)
+            for(auto& x : x_map)
             {
                 if(x.second == expected)
                 {
@@ -124,7 +124,7 @@ vector<string> gen_num(const PatternMap& pat_map, const PatternMap& wc_map, cons
 		vector<string> sub_pat_strs = std::move(gen_num(pat_map, wc_map, num_pat.substr(pat_pos + 1)));
 		if (sub_pat_strs.size())
 			for (auto ch : availables)
-				for (auto sps : sub_pat_strs)
+				for (auto& sps : sub_pat_strs)
 					results.emplace_back(leading_str + ch + sps);
 	}
     else
@@ -139,7 +139,7 @@ vector<string> gen_num(const PatternMap& pat_map, const PatternMap& wc_map, cons
 				sub_pat_strs = std::move(gen_num(x_map, wc_map, num_pat.substr(pat_pos+1)));
 			else
 				sub_pat_strs = std::move(gen_num(pat_map, x_map, num_pat.substr(pat_pos+1)));
-            for(auto sps : sub_pat_strs)
+            for(auto& sps : sub_pat_strs)
                 results.emplace_back(leading_str + ch + sps);
         }
     }
@@ -227,7 +227,7 @@ void get_range_results(const vector<string>& n1_strs, int data_low, int data_hig
 		}
 
 		vector<string> n2_strs = std::move(gen_num(n1_pat_map, n1_wc_map, num2_pat));
-		for (auto n2 : n2_strs)
+		for (auto& n2 : n2_strs)
 		{
 			int y = atoi(n2.c_str());
 			if ((op == '/' || op == '%') && y == 0)

@@ -22,7 +22,7 @@ template<class T> T find_gcd(T a, T b)
 	return b;
 }
 
-std::vector<std::vector<int> > egyptian_number(int Max, int n, int start, unsigned long up, unsigned long low)
+std::vector<std::vector<int> > egyptian_number(int Max, int n, unsigned int start, unsigned long up, unsigned long low)
 {
 	std::vector<std::vector<int> >results;
 	if (n == 1)
@@ -50,7 +50,7 @@ std::vector<std::vector<int> > egyptian_number(int Max, int n, int start, unsign
 
 		 auto gcd = find_gcd(new_up, new_low);
 
-		for (auto vi : egyptian_number(Max, n - 1, i + 1, new_up/gcd, new_low/gcd))
+		for (auto& vi : egyptian_number(Max, n - 1, i + 1, new_up/gcd, new_low/gcd))
 		{
 			vi.push_back(i);
 			results.push_back(std::move(vi));
@@ -77,7 +77,7 @@ int main(void)
 			break;
 
 		int num_results = 0;
-		for (auto vi : egyptian_number(max_number, num_parts, 2, 1, 1))
+		for (auto& vi : egyptian_number(max_number, num_parts, 2, 1, 1))
 		{
 			std::reverse(vi.begin(), vi.end());
 			for (auto i : vi)

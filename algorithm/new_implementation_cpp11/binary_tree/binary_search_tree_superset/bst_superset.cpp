@@ -90,9 +90,9 @@ std::vector<Node<T>*> create_bst(ConstRandIter node_value_begin, ConstRandIter n
 	{
 		auto left_subtrees = create_bst<T>(node_value_begin, std::next(node_value_begin, i));
 		auto right_subtrees = create_bst<T>(std::next(node_value_begin, i + 1), node_value_end);
-		for (auto l_tree :left_subtrees)
+		for (auto& l_tree :left_subtrees)
 		{
-			for (auto r_tree : right_subtrees)
+			for (auto& r_tree : right_subtrees)
 			{
 				Node<T> *root_ptr = new Node<T>(*std::next(node_value_begin, i));
 				root_ptr->left = dup_tree(l_tree);
@@ -100,9 +100,9 @@ std::vector<Node<T>*> create_bst(ConstRandIter node_value_begin, ConstRandIter n
 				trees.push_back(root_ptr);
 			}
 		}
-		for (auto l_tree : left_subtrees)
+		for (auto& l_tree : left_subtrees)
 			kill_tree(l_tree);
-		for (auto r_tree : right_subtrees)
+		for (auto& r_tree : right_subtrees)
 			kill_tree(r_tree);
 	}
 	return trees;
@@ -123,9 +123,9 @@ std::vector<std::shared_ptr<SharedNode<T>>> create_shared_bst(ConstRandIter node
 	{
 		auto left_subtrees = create_shared_bst<T>(node_value_begin, std::next(node_value_begin, i));
 		auto right_subtrees = create_shared_bst<T>(std::next(node_value_begin, i + 1), node_value_end);
-		for (auto l_tree : left_subtrees)
+		for (auto& l_tree : left_subtrees)
 		{
-			for (auto r_tree : right_subtrees)
+			for (auto& r_tree : right_subtrees)
 			{
 				std::shared_ptr<SharedNode<T>> root_ptr(new SharedNode<T>(*std::next(node_value_begin, i)));
 				root_ptr->left = l_tree;
