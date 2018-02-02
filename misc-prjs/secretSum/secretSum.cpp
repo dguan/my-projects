@@ -5,7 +5,7 @@
 #include <functional>
 #include <unordered_set>
 #include <unordered_map>
-//#include <regex>
+#include <regex>
 #include <queue>
 #include <mutex>
 #include <atomic>
@@ -27,7 +27,7 @@ namespace {
     char wc_char_nz = '~';
     string wc_uniq_chars = "QRSTUVWXYZ";
     string wc_uniq_chars_nz = "!@#$%^&*(";
-    //string wc_uniq_chars_nz_regex_str = "!@#$%\\^&*("; // The regex string of these chars
+    string wc_uniq_chars_nz_regex_str = "!@#$%\\^&*("; // The regex string of these chars
 
     string pat_chars = "abcdefghijklmnopqrstuvwxyz";
     string pat_chars_nz = "ABCDEFGH";
@@ -315,8 +315,8 @@ int main()
 
     string original_expression;
     
-    //string num_regex_str = string("[\\w|") + wc_char + wc_char_nz + wc_uniq_chars_nz_regex_str + "]+";
-    //string input_regex_str = "^\\s*" + num_regex_str + "\\s+[+*/%-]\\s+" + num_regex_str + "\\s+=\\s+" + num_regex_str + "\\s*$";
+    string num_regex_str = string("[\\w|") + wc_char + wc_char_nz + wc_uniq_chars_nz_regex_str + "]+";
+    string input_regex_str = "^\\s*" + num_regex_str + "\\s+[+*/%-]\\s+" + num_regex_str + "\\s+=\\s+" + num_regex_str + "\\s*$";
     
     while (1)
     {
@@ -324,13 +324,13 @@ int main()
         std::getline(std::cin, original_expression);
         if(original_expression.length() == 0)
             break;
-/*
+
         if (!regex_match(original_expression, regex(input_regex_str)))
         {
             cout << "There are some errors in the expression, please retry." << endl;
             continue;
         }
-*/        
+        
         std::istringstream iss(original_expression);
         iss >> n1_pat >> op >> n2_pat >> equal >> rslt_pat;
         if( ! init_PatternMaps(pat_map, wc_map, n1_pat, n2_pat, rslt_pat) )
