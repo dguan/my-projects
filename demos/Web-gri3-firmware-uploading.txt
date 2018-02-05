@@ -1,0 +1,1 @@
+Demonstration of firmware uploading for the Topcon GRi3 device, it is developed by using Python as backend, HTML and Javascript as frontend.
