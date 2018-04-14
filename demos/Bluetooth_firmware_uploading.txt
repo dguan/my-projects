@@ -1,1 +1,0 @@
-Demonstration of Bluetooth firmware uploading for all Topcon Minions Stack devices(includeing both Tiva and AVR devices), the application was written in C#.
