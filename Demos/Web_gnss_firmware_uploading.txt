@@ -1,0 +1,1 @@
+Demonstration of firmware uploading for the GNSS card which resides inside of the Topcon GRi3 device, it is developed by using C++ as backend, HTML and Javascript as frontend.
